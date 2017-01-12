@@ -106,8 +106,8 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 		EngineSoundComponent->Stop();
 		EngineSoundComponent->Deactivate();
 		EngineSoundComponent->DestroyComponent();
-		PlaneMesh->DestroyComponent();
-		//Destroy();
+		//PlaneMesh->DestroyComponent();
+		Destroy();
 		return;
 	}
 	FRotator CurrentRotation = GetActorRotation(RootComponent);
