@@ -22,6 +22,9 @@ class CODENAMENUGGETS_API AFighterPawn : public APawn
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
 
+	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* EngineSoundComponent;
+
 public:
 	// Sets default values for this pawn's properties
 	AFighterPawn();
@@ -55,7 +58,8 @@ protected:
 	/** Bound to the Fire Guns button*/
 	void FireGuns();
 
-
+	UPROPERTY(Category =  Spawn, BlueprintReadWrite)
+	TSubclassOf<class AActor> Explosion;
 
 private:
 
@@ -97,6 +101,7 @@ private:
 	UPROPERTY(Category = Plane, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float MaxThrust;
 
+	UPROPERTY(Category = Plane, BlueprintReadOnly, meta  = (AllowPrivateAccess = "true"))
 	float CurrentThrust;
 
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -113,6 +118,15 @@ private:
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float CurrentAltitude;
 
+	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float CurrentPitchAngle;
+
+	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float NormalAirSpeed;
+
+	UPROPERTY(Category = Sound, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class USoundCue* EngineSound;
+
 public:
 	/** Returns PlaneMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
@@ -120,5 +134,13 @@ public:
 	FORCEINLINE class USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	/** Returns Camera subobject **/
 	FORCEINLINE class UCameraComponent* GetCamera() const { return Camera; }
+
+private:
+	// Handling the explosion
+	void SpawnExplosion();
+
+	// Handling Sound ManageMent
+	void ConfigEngineSound();
+
 	
 };

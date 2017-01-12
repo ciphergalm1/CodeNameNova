@@ -18,6 +18,11 @@ AFighterPawn::AFighterPawn()
 	};
 	static FConstructorStatics ConstructorStatics;
 
+	static ConstructorHelpers::FObjectFinder<UBlueprint> ExplosionBase(TEXT("Blueprint'/Game/Assets/ParticleSystem/Blueprint_Effect_CustomExplosion.Blueprint_Effect_CustomExplosion'"));
+	if (ExplosionBase.Object) {
+		Explosion = (UClass*)ExplosionBase.Object->GeneratedClass;
+	}
+
 	// Create static mesh component
 	PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
 	PlaneMesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
@@ -37,15 +42,31 @@ AFighterPawn::AFighterPawn()
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false; // Don't rotate camera with controller
 
+	//Create Engine Sound
+	static ConstructorHelpers::FObjectFinder<USoundCue> EngineSoundRef(
+		TEXT("SoundCue'/Game/Assets/SFX/EngineSound/MiG-21_ENG.MiG-21_ENG'")
+	);
+
+	// Store a reference to the Cue asset
+	EngineSound = EngineSoundRef.Object;
+
+	EngineSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSoundObj"));
+	EngineSoundComponent->SetupAttachment(RootComponent);
+	if(EngineSound)
+	EngineSoundComponent->SetSound(EngineSound);
+	EngineSoundComponent->SetVolumeMultiplier(.28f);
+	EngineSoundComponent->bAutoActivate = true;
+
 	// Setting aircraft parameters
 	Acceleration = 400.f;
 	TurnSpeed = 80.f;
 	MaxSpeed = 4000.f;
-	MinSpeed = 700.f;
-	CurrentForwardSpeed = 500.f;
+	MinSpeed = 1000.f;
+	CurrentForwardSpeed = 1000.f;
 	CurrentYawSpeed = 0.0f;
 	aircraftHP = 100.f;
 	SpeedDelta = MaxSpeed - MinSpeed;
+	NormalAirSpeed = (MinSpeed + MaxSpeed) / 2;
 }
 
 void AFighterPawn::Tick(float DeltaSeconds)
@@ -73,7 +94,14 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit something!"));
-	// Deflect along the surface when we collide.
+	// Destroy the pawn if player hit the ground
+	if (Other->ActorHasTag("Terrain")) {
+		// emit the explosion
+		SpawnExplosion();
+		PlaneMesh->DestroyComponent();
+		//Destroy();
+		return;
+	}
 	FRotator CurrentRotation = GetActorRotation(RootComponent);
 	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
 }
@@ -90,19 +118,33 @@ void AFighterPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveYaw", this, &AFighterPawn::MoveYawInput);
 }
 
+/** manage aircraft thrust input*/
 void AFighterPawn::ThrustInput(float Val)
 {
 	// Is there no input?
 	bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
+	float NewForwardSpeed = 0.0f;
+	if (bHasInput) {
+		float CurrentAcc = Val * Acceleration;
+		NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+	}
+	else {
+		NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, NormalAirSpeed, GetWorld()->GetDeltaSeconds(), 8.f);
+	}
+	/*
 	// If input is not held down, reduce speed
 	float CurrentAcc = bHasInput ? (Val * Acceleration) : (-0.5f * Acceleration);
 	// Calculate new speed
 	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
-	
+	*/
+
 	// Clamp between MinSpeed and MaxSpeed
 	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 
 	CurrentThrustRatio = (CurrentForwardSpeed - MinSpeed )/ SpeedDelta;
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(CurrentThrustRatio));
+	ConfigEngineSound();
+
 }
 
 void AFighterPawn::MoveUpInput(float Val)
@@ -156,4 +198,29 @@ void AFighterPawn::FireMissile() {
 void AFighterPawn::FireGuns() {
 	// define fire guns function
 
+}
+
+void AFighterPawn::SpawnExplosion()
+{
+	// check spawn object
+	if (Explosion != NULL) {
+		UWorld* const world = GetWorld();
+
+		//check world
+		if (world) {
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+			FVector SpawnLocation = GetActorLocation();
+			FRotator SpawnRotation = GetActorRotation();
+			world->SpawnActor<AActor>(Explosion,SpawnLocation,SpawnRotation,SpawnParams);
+		}
+	}
+}
+
+void AFighterPawn::ConfigEngineSound()
+{
+	float audioPitch = CurrentThrustRatio*0.6 + 0.8;
+	EngineSoundComponent->SetPitchMultiplier(audioPitch);
 }
