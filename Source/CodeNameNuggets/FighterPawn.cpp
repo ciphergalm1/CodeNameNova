@@ -72,7 +72,7 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit something!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit something!"));
 	// Deflect along the surface when we collide.
 	FRotator CurrentRotation = GetActorRotation(RootComponent);
 	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
@@ -146,4 +146,14 @@ void AFighterPawn::MoveYawInput(float Val)
 
 	// Smoothly interpolate to target pitch speed
 	CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetYawSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+}
+
+void AFighterPawn::FireMissile() {
+	// define fire missile function
+
+}
+
+void AFighterPawn::FireGuns() {
+	// define fire guns function
+
 }

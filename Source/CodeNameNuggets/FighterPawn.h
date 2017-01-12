@@ -49,6 +49,13 @@ protected:
 	/** Bound to the Yaw axis */
 	void MoveYawInput(float Val);
 
+	/** Bound to the Fire Missile button */
+	void FireMissile();
+
+	/** Bound to the Fire Guns button*/
+	void FireGuns();
+
+
 
 private:
 
