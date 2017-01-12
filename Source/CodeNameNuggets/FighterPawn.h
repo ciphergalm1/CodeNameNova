@@ -63,6 +63,10 @@ protected:
 
 private:
 
+	// Player is alive or not
+	UPROPERTY(Category = Plane, EditAnywhere)
+	bool isAlive;
+
 	/** How quickly forward speed changes */
 	UPROPERTY(Category = Plane, EditAnywhere)
 	float Acceleration;
@@ -128,12 +132,30 @@ private:
 	class USoundCue* EngineSound;
 
 public:
+
 	/** Returns PlaneMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
 	/** Returns SpringArm subobject **/
 	FORCEINLINE class USpringArmComponent* GetSpringArm() const { return SpringArm; }
 	/** Returns Camera subobject **/
 	FORCEINLINE class UCameraComponent* GetCamera() const { return Camera; }
+
+	//return the status of the aircraft for UI
+	UFUNCTION(Category = UI, BlueprintPure)
+	float GetAirSpeed() const;
+
+	//return the status of the aircraft for UI
+	UFUNCTION(Category = UI, BlueprintPure)
+	float GetAltitude() const;
+
+	//return the status of the aircraft for UI
+	UFUNCTION(Category = UI, BlueprintPure)
+	float GetThrust() const;
+
+	//return the status of the aircraft for UI
+	UFUNCTION(Category = UI, BlueprintPure)
+	float GetBearing() const;
+
 
 private:
 	// Handling the explosion

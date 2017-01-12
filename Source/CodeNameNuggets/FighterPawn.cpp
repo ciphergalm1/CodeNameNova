@@ -27,6 +27,7 @@ AFighterPawn::AFighterPawn()
 	PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
 	PlaneMesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
 	RootComponent = PlaneMesh;
+	PlaneMesh->SetSimulatePhysics(true);
 
 	// Create a spring arm component
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
@@ -55,12 +56,15 @@ AFighterPawn::AFighterPawn()
 	if(EngineSound)
 	EngineSoundComponent->SetSound(EngineSound);
 	EngineSoundComponent->SetVolumeMultiplier(.28f);
-	EngineSoundComponent->bAutoActivate = true;
+	
+	EngineSoundComponent->bStopWhenOwnerDestroyed = true;
+	EngineSoundComponent->Activate();
 
 	// Setting aircraft parameters
+	isAlive = true;
 	Acceleration = 400.f;
 	TurnSpeed = 80.f;
-	MaxSpeed = 4000.f;
+	MaxSpeed = 5000.f;
 	MinSpeed = 1000.f;
 	CurrentForwardSpeed = 1000.f;
 	CurrentYawSpeed = 0.0f;
@@ -98,6 +102,10 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 	if (Other->ActorHasTag("Terrain")) {
 		// emit the explosion
 		SpawnExplosion();
+		EngineSoundComponent->SetVolumeMultiplier(0.0f);
+		EngineSoundComponent->Stop();
+		EngineSoundComponent->Deactivate();
+		EngineSoundComponent->DestroyComponent();
 		PlaneMesh->DestroyComponent();
 		//Destroy();
 		return;
@@ -129,7 +137,7 @@ void AFighterPawn::ThrustInput(float Val)
 		NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 	}
 	else {
-		NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, NormalAirSpeed, GetWorld()->GetDeltaSeconds(), 8.f);
+		NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, NormalAirSpeed, GetWorld()->GetDeltaSeconds(), 5.0f);
 	}
 	/*
 	// If input is not held down, reduce speed
@@ -142,8 +150,11 @@ void AFighterPawn::ThrustInput(float Val)
 	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 
 	CurrentThrustRatio = (CurrentForwardSpeed - MinSpeed )/ SpeedDelta;
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(CurrentThrustRatio));
 	ConfigEngineSound();
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(CurrentThrustRatio));
+	FVector gVector = FVector(0,0,-9.8);
+	if(CurrentThrustRatio<.4)
+	PlaneMesh->AddForce(gVector);
 
 }
 
@@ -200,6 +211,27 @@ void AFighterPawn::FireGuns() {
 
 }
 
+float AFighterPawn::GetAirSpeed() const
+{
+	return CurrentForwardSpeed/10;
+}
+
+float AFighterPawn::GetAltitude() const
+{
+	FVector currentLocation = GetActorLocation();
+	return currentLocation.Z;
+}
+
+float AFighterPawn::GetThrust() const
+{
+	return CurrentThrustRatio;
+}
+
+float AFighterPawn::GetBearing() const
+{
+	return 0.0f;
+}
+
 void AFighterPawn::SpawnExplosion()
 {
 	// check spawn object
@@ -208,7 +240,6 @@ void AFighterPawn::SpawnExplosion()
 
 		//check world
 		if (world) {
-
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 			SpawnParams.Instigator = Instigator;
@@ -221,6 +252,8 @@ void AFighterPawn::SpawnExplosion()
 
 void AFighterPawn::ConfigEngineSound()
 {
-	float audioPitch = CurrentThrustRatio*0.6 + 0.8;
-	EngineSoundComponent->SetPitchMultiplier(audioPitch);
+	if (isAlive) {
+		float audioPitch = CurrentThrustRatio*0.6 + 0.8;
+		EngineSoundComponent->SetPitchMultiplier(audioPitch);
+	}
 }
