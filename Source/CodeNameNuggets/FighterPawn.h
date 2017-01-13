@@ -156,6 +156,12 @@ public:
 	UFUNCTION(Category = UI, BlueprintPure)
 	float GetBearing() const;
 
+	UFUNCTION(Category = Sound, BlueprintCallable)
+	void SetSoundVolume(float volume);
+
+	UFUNCTION(Category = Sound, BlueprintCallable)
+	void SetSoundRefNull();
+
 
 private:
 	// Handling the explosion

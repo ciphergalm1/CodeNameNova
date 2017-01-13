@@ -56,9 +56,8 @@ AFighterPawn::AFighterPawn()
 	if(EngineSound)
 	EngineSoundComponent->SetSound(EngineSound);
 	EngineSoundComponent->SetVolumeMultiplier(.28f);
-	
 	EngineSoundComponent->bStopWhenOwnerDestroyed = true;
-	EngineSoundComponent->Activate();
+	EngineSoundComponent->Play();
 
 	// Setting aircraft parameters
 	isAlive = true;
@@ -110,8 +109,11 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 		Destroy();
 		return;
 	}
-	FRotator CurrentRotation = GetActorRotation(RootComponent);
-	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	else {
+		FRotator CurrentRotation = GetActorRotation(RootComponent);
+		SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	}
+	
 }
 
 
@@ -137,7 +139,7 @@ void AFighterPawn::ThrustInput(float Val)
 		NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 	}
 	else {
-		NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, NormalAirSpeed, GetWorld()->GetDeltaSeconds(), 5.0f);
+		NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, NormalAirSpeed, GetWorld()->GetDeltaSeconds(), 1.0f);
 	}
 	/*
 	// If input is not held down, reduce speed
@@ -219,7 +221,7 @@ float AFighterPawn::GetAirSpeed() const
 float AFighterPawn::GetAltitude() const
 {
 	FVector currentLocation = GetActorLocation();
-	return currentLocation.Z;
+	return FMath::Floor(currentLocation.Z/100);
 }
 
 float AFighterPawn::GetThrust() const
@@ -229,7 +231,23 @@ float AFighterPawn::GetThrust() const
 
 float AFighterPawn::GetBearing() const
 {
-	return 0.0f;
+	FRotator currentRotation = GetActorRotation();
+	// get the yaw set
+	float result = currentRotation.Yaw;
+	if (result < 0) {
+		result += 360.0f;
+	}
+	return FMath::Floor(result);
+}
+
+void AFighterPawn::SetSoundVolume(float volume)
+{
+	EngineSoundComponent->SetVolumeMultiplier(volume);
+}
+
+void AFighterPawn::SetSoundRefNull()
+{
+	EngineSoundComponent->SetSound(NULL);
 }
 
 void AFighterPawn::SpawnExplosion()
