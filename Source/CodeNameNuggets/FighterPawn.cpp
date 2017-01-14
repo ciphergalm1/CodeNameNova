@@ -50,12 +50,12 @@ AFighterPawn::AFighterPawn()
 
 	// Store a reference to the Cue asset
 	EngineSound = EngineSoundRef.Object;
-
+	//EngineSound->VolumeMultiplier = 0.5f;
 	EngineSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSoundObj"));
 	EngineSoundComponent->SetupAttachment(RootComponent);
 	if(EngineSound)
 	EngineSoundComponent->SetSound(EngineSound);
-	EngineSoundComponent->SetVolumeMultiplier(.28f);
+	EngineSoundComponent->SetVolumeMultiplier(.5f);
 	EngineSoundComponent->bStopWhenOwnerDestroyed = true;
 	EngineSoundComponent->Play();
 
@@ -102,6 +102,7 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 		// emit the explosion
 		SpawnExplosion();
 		EngineSoundComponent->SetVolumeMultiplier(0.0f);
+		EngineSoundComponent->SetPaused(true);
 		EngineSoundComponent->Stop();
 		EngineSoundComponent->Deactivate();
 		EngineSoundComponent->DestroyComponent();
