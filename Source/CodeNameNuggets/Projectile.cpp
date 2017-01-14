@@ -26,3 +26,9 @@ void AProjectile::Tick( float DeltaTime )
 
 }
 
+void AProjectile::SetSpeed(FVector& newSpeed)
+{
+	ForwardSpeed = newSpeed;
+}
+
+

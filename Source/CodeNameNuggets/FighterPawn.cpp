@@ -71,8 +71,8 @@ AFighterPawn::AFighterPawn()
 	isAlive = true;
 	Acceleration = 400.f;
 	TurnSpeed = 80.f;
-	MaxSpeed = 5000.f;
-	MinSpeed = 1000.f;
+	MaxSpeed = 8000.f;
+	MinSpeed = 3000.f;
 	CurrentForwardSpeed = 1000.f;
 	CurrentYawSpeed = 0.0f;
 	aircraftHP = 100.f;

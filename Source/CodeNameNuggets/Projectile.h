@@ -20,6 +20,12 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	void SetSpeed(FVector& newSpeed);
+
+private:
+	UPROPERTY(Category = Speed, VisibleAnywhere)
+	FVector ForwardSpeed;
+
 	
 	
 };
