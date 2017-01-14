@@ -2,6 +2,7 @@
 
 #include "CodeNameNuggets.h"
 #include "FighterPawn.h"
+#include "CustomExplosion_Aircraft.h"
 
 AFighterPawn::AFighterPawn()
 {
@@ -18,10 +19,12 @@ AFighterPawn::AFighterPawn()
 	};
 	static FConstructorStatics ConstructorStatics;
 
+	/*
 	static ConstructorHelpers::FObjectFinder<UBlueprint> ExplosionBase(TEXT("Blueprint'/Game/Assets/ParticleSystem/Blueprint_Effect_CustomExplosion.Blueprint_Effect_CustomExplosion'"));
 	if (ExplosionBase.Object) {
 		Explosion = (UClass*)ExplosionBase.Object->GeneratedClass;
 	}
+	*/
 
 	// Create static mesh component
 	PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
@@ -58,7 +61,8 @@ AFighterPawn::AFighterPawn()
 		EngineSoundComponent->SetSound(EngineSoundRef.Object);
 		EngineSoundComponent->SetVolumeMultiplier(.5f);
 		EngineSoundComponent->bStopWhenOwnerDestroyed = true;
-		EngineSoundComponent->Play();
+		EngineSoundComponent->bAlwaysPlay = false;
+		EngineSoundComponent->Activate();
 	}
 	
 	
@@ -105,14 +109,15 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 	if (Other->ActorHasTag("Terrain")) {
 		// emit the explosion
 		SpawnExplosion();
-		EngineSoundComponent->SetVolumeMultiplier(0.0f);
-		EngineSoundComponent->SetPaused(true);
+		//EngineSoundComponent->SetVolumeMultiplier(0.0f);
+		//EngineSoundComponent->SetPaused(true);
+		//EngineSoundComponent->PlaybackCompleted(EngineSoundComponent->GetAudioComponentID(),false);
+		//EngineSoundComponent->FadeOut(.5f, .0f);
 		EngineSoundComponent->Stop();
 		EngineSoundComponent->Deactivate();
 		EngineSoundComponent->DestroyComponent();
 		//PlaneMesh->DestroyComponent();
 		Destroy();
-		return;
 	}
 	else {
 		FRotator CurrentRotation = GetActorRotation(RootComponent);
@@ -259,19 +264,19 @@ void AFighterPawn::SetSoundRefNull()
 void AFighterPawn::SpawnExplosion()
 {
 	// check spawn object
-	if (Explosion != NULL) {
-		UWorld* const world = GetWorld();
+	
+	UWorld* const world = GetWorld();
 
-		//check world
-		if (world) {
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
-			FVector SpawnLocation = GetActorLocation();
-			FRotator SpawnRotation = GetActorRotation();
-			world->SpawnActor<AActor>(Explosion,SpawnLocation,SpawnRotation,SpawnParams);
-		}
+	//check world
+	if (world) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+		world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation,SpawnRotation,SpawnParams);
 	}
+	
 }
 
 void AFighterPawn::ConfigEngineSound()

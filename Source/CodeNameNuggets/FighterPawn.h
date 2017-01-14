@@ -58,8 +58,10 @@ protected:
 	/** Bound to the Fire Guns button*/
 	void FireGuns();
 
+	/*
 	UPROPERTY(Category =  Spawn, BlueprintReadWrite)
-	TSubclassOf<class AActor> Explosion;
+	TSubclassOf<class Custom> Explosion;
+	*/
 
 private:
 

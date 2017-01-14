@@ -20,6 +20,19 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	
+	// end play event
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason ) override;
+
+private:
+	// Particle system component for managing the explosion effect
+	UPROPERTY(Category = Effect, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystemComponent* ExplosionEffectComponent;
+
+	// Audiocomponent for managing the sound effect
+	UPROPERTY(Category = Effect, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* ExplosionSoundComponent;
+
+	// for handling the self destruction
+	//FTimerHandle explosionHandle;
 	
 };
