@@ -43,21 +43,25 @@ AFighterPawn::AFighterPawn()
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false; // Don't rotate camera with controller
 
-	//Create Engine Sound
+	// Get Engine Sound Ref
 	static ConstructorHelpers::FObjectFinder<USoundCue> EngineSoundRef(
 		TEXT("SoundCue'/Game/Assets/SFX/EngineSound/MiG-21_ENG.MiG-21_ENG'")
 	);
 
-	// Store a reference to the Cue asset
-	EngineSound = EngineSoundRef.Object;
-	//EngineSound->VolumeMultiplier = 0.5f;
 	EngineSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSoundObj"));
 	EngineSoundComponent->SetupAttachment(RootComponent);
-	if(EngineSound)
-	EngineSoundComponent->SetSound(EngineSound);
-	EngineSoundComponent->SetVolumeMultiplier(.5f);
-	EngineSoundComponent->bStopWhenOwnerDestroyed = true;
-	EngineSoundComponent->Play();
+	
+	// looping sound problem not solved........
+	// checking looping sound problem
+	if (EngineSoundRef.Succeeded()) {
+		//EngineSound->VolumeMultiplier = .3f;
+		EngineSoundComponent->SetSound(EngineSoundRef.Object);
+		EngineSoundComponent->SetVolumeMultiplier(.5f);
+		EngineSoundComponent->bStopWhenOwnerDestroyed = true;
+		EngineSoundComponent->Play();
+	}
+	
+	
 
 	// Setting aircraft parameters
 	isAlive = true;
@@ -219,10 +223,11 @@ float AFighterPawn::GetAirSpeed() const
 	return CurrentForwardSpeed/10;
 }
 
-float AFighterPawn::GetAltitude() const
+int AFighterPawn::GetAltitude() const
 {
 	FVector currentLocation = GetActorLocation();
-	return FMath::Floor(currentLocation.Z/100);
+	float result = currentLocation.Z / 100;
+	return FMath::FloorToInt(result);
 }
 
 float AFighterPawn::GetThrust() const
@@ -230,7 +235,7 @@ float AFighterPawn::GetThrust() const
 	return CurrentThrustRatio;
 }
 
-float AFighterPawn::GetBearing() const
+int AFighterPawn::GetBearing() const
 {
 	FRotator currentRotation = GetActorRotation();
 	// get the yaw set
@@ -238,7 +243,7 @@ float AFighterPawn::GetBearing() const
 	if (result < 0) {
 		result += 360.0f;
 	}
-	return FMath::Floor(result);
+	return FMath::FloorToInt(result);
 }
 
 void AFighterPawn::SetSoundVolume(float volume)

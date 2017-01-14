@@ -128,9 +128,6 @@ private:
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float NormalAirSpeed;
 
-	UPROPERTY(Category = Sound, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USoundCue* EngineSound;
-
 public:
 
 	/** Returns PlaneMesh subobject **/
@@ -146,7 +143,7 @@ public:
 
 	//return the status of the aircraft for UI
 	UFUNCTION(Category = UI, BlueprintPure)
-	float GetAltitude() const;
+	int GetAltitude() const;
 
 	//return the status of the aircraft for UI
 	UFUNCTION(Category = UI, BlueprintPure)
@@ -154,7 +151,7 @@ public:
 
 	//return the status of the aircraft for UI
 	UFUNCTION(Category = UI, BlueprintPure)
-	float GetBearing() const;
+	int GetBearing() const;
 
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundVolume(float volume);
