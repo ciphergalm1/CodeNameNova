@@ -10,6 +10,9 @@ class CODENAMENUGGETS_API AEnemyPawn : public APawn
 {
 	GENERATED_BODY()
 
+	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* EnemyMesh;
+
 public:
 	// Sets default values for this pawn's properties
 	AEnemyPawn();
@@ -23,9 +26,27 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	UPROPERTY(Category = target, BlueprintReadOnly)
+	class AActor* currentTarget;
+
 private:
 
+	FRotator enemyAttitude;
 
-	
+	float CurrentAirSpeed;
+
+	void FlyInCircle();
+
+	void FireControl();
+
+	void AttackTarget(AActor* Target);
+
+	bool CanAttack();
+
+	void resetTimer();
+
+	float currentAttackTimer;
+
+	float AttackInterval;
 	
 };

@@ -2,7 +2,7 @@
 
 #include "CodeNameNuggets.h"
 #include "EnemyPawn.h"
-
+#include "MissileCustom.h"
 
 // Sets default values
 AEnemyPawn::AEnemyPawn()
@@ -10,20 +10,36 @@ AEnemyPawn::AEnemyPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	ConstructorHelpers::FObjectFinder<UStaticMesh> enemyMeshRef(TEXT("StaticMesh'/Game/Assets/Models/F16/F-16C.F-16C'"));
+	EnemyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Enemy Mesh"));
+	if (enemyMeshRef.Succeeded()) {
+		EnemyMesh->SetStaticMesh(enemyMeshRef.Object);
+	}
+	EnemyMesh->ComponentTags.Push(FName("EnemyAircraft"));
+	RootComponent = EnemyMesh;
+	EnemyMesh->SetSimulatePhysics(true);
+
+	// set up enemy aircraft movment
+	CurrentAirSpeed = 6000.f;
+	enemyAttitude = FRotator(0.f,-30.0f,0.f);
+	AddActorLocalRotation(enemyAttitude);
 }
 
 // Called when the game starts or when spawned
 void AEnemyPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	currentTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 // Called every frame
 void AEnemyPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
+	// manage attack timer;
+	currentAttackTimer += GetWorld()->GetDeltaSeconds();
+	FlyInCircle();
+	FireControl();
 }
 
 // Called to bind functionality to input
@@ -31,5 +47,44 @@ void AEnemyPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent
 {
 	Super::SetupPlayerInputComponent(InputComponent);
 
+}
+
+void AEnemyPawn::FlyInCircle()
+{
+	FVector movingOffset = FVector(CurrentAirSpeed, 10*FMath::Sqrt(3.0f), 10.f);
+	AddActorLocalOffset(movingOffset);
+}
+
+void AEnemyPawn::FireControl()
+{
+	if (CanAttack()) {
+		AttackTarget(currentTarget);
+		resetTimer();
+	}
+}
+
+void AEnemyPawn::AttackTarget(AActor * Target)
+{
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have fire at you!"));
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = Instigator;
+	FVector SpawnLocation = GetActorLocation() + EnemyMesh->GetSocketLocation(FName("Pylon_Main"));
+	FRotator SpawnRotation = GetActorRotation();
+	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
+	missile->EngageTarget(Target);
+}
+
+bool AEnemyPawn::CanAttack()
+{
+	bool result = false;
+	result = (currentAttackTimer < AttackInterval) ? true : false;
+	return result;
+}
+
+void AEnemyPawn::resetTimer()
+{
+	currentAttackTimer = 0.f;
 }
 

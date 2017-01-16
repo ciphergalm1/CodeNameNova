@@ -29,6 +29,8 @@ AFighterPawn::AFighterPawn()
 	// Create static mesh component
 	PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
 	PlaneMesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
+	//add tag to Player PlaneMesh
+	PlaneMesh->ComponentTags.Push(FName("PlayerAircraft"));
 	RootComponent = PlaneMesh;
 	PlaneMesh->SetSimulatePhysics(true);
 
@@ -64,8 +66,6 @@ AFighterPawn::AFighterPawn()
 		EngineSoundComponent->bAlwaysPlay = false;
 		EngineSoundComponent->Activate();
 	}
-	
-	
 
 	// Setting aircraft parameters
 	isAlive = true;
@@ -83,6 +83,14 @@ AFighterPawn::AFighterPawn()
 void AFighterPawn::Tick(float DeltaSeconds)
 {
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
+
+	// check component tag
+	/*
+	if (PlaneMesh->ComponentHasTag("PlayerAircraft")&&this->ActorHasTag("PlayerAircraft")) {
+		FString tagMessage = this->Tags.Top().ToString();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, tagMessage);
+	}
+	*/
 
 	// Move plane forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
