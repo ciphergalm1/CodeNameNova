@@ -109,8 +109,8 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 	if (Other->ActorHasTag("Terrain")) {
 		// emit the explosion
 		SpawnExplosion();
-		//EngineSoundComponent->SetVolumeMultiplier(0.0f);
-		//EngineSoundComponent->SetPaused(true);
+		EngineSoundComponent->SetVolumeMultiplier(0.0f);
+		EngineSoundComponent->SetPaused(true);
 		//EngineSoundComponent->PlaybackCompleted(EngineSoundComponent->GetAudioComponentID(),false);
 		//EngineSoundComponent->FadeOut(.5f, .0f);
 		EngineSoundComponent->Stop();
@@ -119,10 +119,15 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 		//PlaneMesh->DestroyComponent();
 		Destroy();
 	}
-	else {
-		FRotator CurrentRotation = GetActorRotation(RootComponent);
-		SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+
+	if (Other->ActorHasTag("Aircraft")) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit an C-5!"));
+		ReceiveDamage(10.0f);
 	}
+	
+	FRotator CurrentRotation = GetActorRotation(RootComponent);
+	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	
 	
 }
 
@@ -251,6 +256,11 @@ int AFighterPawn::GetBearing() const
 	return FMath::FloorToInt(result);
 }
 
+int AFighterPawn::GetHealth() const
+{
+	return FMath::FloorToInt(aircraftHP);
+}
+
 void AFighterPawn::SetSoundVolume(float volume)
 {
 	EngineSoundComponent->SetVolumeMultiplier(volume);
@@ -259,6 +269,14 @@ void AFighterPawn::SetSoundVolume(float volume)
 void AFighterPawn::SetSoundRefNull()
 {
 	EngineSoundComponent->SetSound(NULL);
+}
+
+void AFighterPawn::ReceiveDamage(float damageVal)
+{
+	FString hitMessage = "You got hit by :";
+	hitMessage += FString::SanitizeFloat(damageVal);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, hitMessage);
+	aircraftHP -= damageVal;
 }
 
 void AFighterPawn::SpawnExplosion()

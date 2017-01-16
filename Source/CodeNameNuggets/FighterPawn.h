@@ -155,11 +155,17 @@ public:
 	UFUNCTION(Category = UI, BlueprintPure)
 	int GetBearing() const;
 
+	UFUNCTION(Category = UI, BlueprintPure)
+	int GetHealth() const;
+
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundVolume(float volume);
 
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundRefNull();
+
+	UFUNCTION(Category = Damage, BlueprintCallable)
+	void ReceiveDamage(float damageVal);
 
 
 private:

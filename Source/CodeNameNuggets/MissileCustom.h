@@ -20,6 +20,14 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+private:
+
+	// Manage target hit flag
+	bool bHasHitTarget;
+
+
+
+
 	
 	
 };
