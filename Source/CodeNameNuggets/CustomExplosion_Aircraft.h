@@ -32,7 +32,11 @@ private:
 	UPROPERTY(Category = Effect, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* ExplosionSoundComponent;
 
+	float fMaxLifeTime;
+
+	float fLifeTime;
+
 	// for handling the self destruction
-	//FTimerHandle explosionHandle;
+	bool bIsStillAlive();
 	
 };

@@ -34,7 +34,8 @@ ACustomExplosion_Aircraft::ACustomExplosion_Aircraft()
 	//ExplosionSoundComponent->bStopWhenOwnerDestroyed = true;
 	ExplosionSoundComponent->SetupAttachment(RootComponent);
 
-
+	fMaxLifeTime = 4.0f;
+	fLifeTime = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -43,8 +44,7 @@ void ACustomExplosion_Aircraft::BeginPlay()
 	Super::BeginPlay();
 	ExplosionEffectComponent->ActivateSystem();
 	ExplosionSoundComponent->Play();
-	//GetWorld()->GetTimerManager().SetTimer(explosionHandle, this, &ACustomExplosion_Aircraft::Destroy, 3.0f, false,-1.0f);
-	//GetWorld()->GetTimerManager().SetTimer(explosionHandle, this, &ACustomExplosion_Aircraft::Destroy, 3.0f);
+	fLifeTime = 0.0f;
 }
 
 // Called every frame
@@ -52,6 +52,10 @@ void ACustomExplosion_Aircraft::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	fLifeTime += 1.0*(GetWorld()->GetDeltaSeconds());
+	if (!bIsStillAlive()) {
+		Destroy();
+	}
 }
 
 void ACustomExplosion_Aircraft::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -59,4 +63,13 @@ void ACustomExplosion_Aircraft::EndPlay(const EEndPlayReason::Type EndPlayReason
 	Super::EndPlay(EndPlayReason);
 	//GetWorld()->GetTimerManager().ClearTimer(explosionHandle);
 }
+
+bool ACustomExplosion_Aircraft::bIsStillAlive()
+{
+	bool result = true;
+	result = (fLifeTime<fMaxLifeTime) ? true:false ;
+	return result;
+}
+
+
 

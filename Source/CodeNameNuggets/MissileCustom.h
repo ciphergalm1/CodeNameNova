@@ -25,6 +25,9 @@ private:
 	// Manage target hit flag
 	bool bHasHitTarget;
 
+	float fLifeTimeMax;
+
+
 
 
 

@@ -104,7 +104,7 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit something!"));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You plane hit something!"));
 	// Destroy the pawn if player hit the ground
 	if (Other->ActorHasTag("Terrain")) {
 		// emit the explosion
@@ -152,6 +152,7 @@ void AFighterPawn::ThrustInput(float Val)
 	if (bHasInput) {
 		float CurrentAcc = Val * Acceleration;
 		NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+		//ReceiveDamage(Val*(GetWorld()->GetDeltaSeconds()));
 	}
 	else {
 		NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, NormalAirSpeed, GetWorld()->GetDeltaSeconds(), 1.0f);
