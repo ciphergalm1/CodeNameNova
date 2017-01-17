@@ -40,7 +40,13 @@ private:
 	// Manage target hit flag
 	bool bHasHitTarget;
 
+	float SelfDestructionTimer;
+
 	bool bHasBeenFired;
+
+	bool bStartDestruction;
+
+	float fLifeTime;
 
 	float fLifeTimeMax;
 
@@ -48,12 +54,16 @@ private:
 
 	float turnRate;
 
-	void boosting();
+	void Boosting();
 
 	void SetTarget(AActor* target);
 
 	void Homing(AActor* target);
 
 	void Fire();
+
+	void SelfDestruction();
+
+
 	
 };

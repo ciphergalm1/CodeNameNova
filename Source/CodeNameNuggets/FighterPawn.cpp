@@ -236,7 +236,7 @@ void AFighterPawn::FireMissile() {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = Instigator;
-	FVector SpawnLocation = GetActorLocation() + PlaneMesh->GetSocketLocation(FName("Pylon_L"));
+	FVector SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_L"));
 	FRotator SpawnRotation = GetActorRotation();
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
 	//missile->EngageTarget(Target);

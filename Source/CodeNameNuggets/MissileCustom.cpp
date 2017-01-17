@@ -31,12 +31,16 @@ AMissileCustom::AMissileCustom()
 	MissileTrailComponent->bAutoActivate = true;
 
 	// set up the missile
-	currentAirSpeed = 500.f;
+	currentAirSpeed = 3000.f;
 	bHasHitTarget = false;
 	bHasBeenFired = false;
 
+	SelfDestructionTimer = 3.0f;
+	
+	fLifeTimeMax = 25.0f;
+
 	currentTarget = nullptr;
-	turnRate = 20.f;
+	turnRate = 80.f;
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +50,7 @@ void AMissileCustom::BeginPlay()
 	
 	//currentTarget = ;
 	AActor* Target = nullptr;
+	fLifeTime = 0.f;
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		// Same as with the Object Iterator, access the subclass instance with the * or -> operators.
@@ -70,11 +75,26 @@ void AMissileCustom::BeginPlay()
 void AMissileCustom::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
+
+	fLifeTime += GetWorld()->GetDeltaSeconds();
+	if (fLifeTime > fLifeTimeMax) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Missile running out of fuel!"));
+		Destroy();
+	}
+
 	if (bHasBeenFired) {
-		boosting();
+		Boosting();
 
 		if (!bHasHitTarget) {
 			Homing(currentTarget);
+		}
+
+		if (bStartDestruction) {
+			SelfDestructionTimer -= GetWorld()->GetDeltaSeconds();
+			if (SelfDestructionTimer<0) {
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Missile is gone!"));
+				Destroy();
+			}
 		}
 	}
 }
@@ -87,7 +107,7 @@ void AMissileCustom::EngageTarget(AActor * target)
 	Fire();
 }
 
-void AMissileCustom::boosting()
+void AMissileCustom::Boosting()
 {
 	FVector movment = FVector(currentAirSpeed, 0.f, 0.f);
 	AddActorLocalOffset(movment*GetWorld()->GetDeltaSeconds());
@@ -114,6 +134,15 @@ void AMissileCustom::Fire()
 	//AddActorLocalOffset(movment);
 }
 
+void AMissileCustom::SelfDestruction()
+{
+	MissileMeshComponent->DestroyComponent();
+	SelfDestructionTimer -= GetWorld()->GetDeltaSeconds();
+	if (SelfDestructionTimer<0) {
+		Destroy();
+	}
+}
+
 void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
@@ -128,6 +157,7 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 		FVector SpawnLocation = GetActorLocation();
 		FRotator SpawnRotation = GetActorRotation();
 		world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
+		SelfDestruction();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
 	}
 	bHasHitTarget = true;
