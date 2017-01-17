@@ -58,6 +58,8 @@ protected:
 	/** Bound to the Fire Guns button*/
 	void FireGuns();
 
+	bool bMissileOnLeftPylon;
+
 	/*
 	UPROPERTY(Category =  Spawn, BlueprintReadWrite)
 	TSubclassOf<class Custom> Explosion;

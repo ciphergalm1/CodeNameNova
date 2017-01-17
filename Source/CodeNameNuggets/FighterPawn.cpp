@@ -79,6 +79,7 @@ AFighterPawn::AFighterPawn()
 	aircraftHP = 100.f;
 	SpeedDelta = MaxSpeed - MinSpeed;
 	NormalAirSpeed = (MinSpeed + MaxSpeed) / 2;
+	bMissileOnLeftPylon = true;
 }
 
 void AFighterPawn::Tick(float DeltaSeconds)
@@ -232,12 +233,19 @@ void AFighterPawn::MoveYawInput(float Val)
 
 void AFighterPawn::FireMissile() {
 	// define fire missile function
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player have fired!"));
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player have fired!"));
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = Instigator;
-	FVector SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_L"));
 	FRotator SpawnRotation = GetActorRotation();
+	FVector SpawnLocation;
+	if (bMissileOnLeftPylon) {
+		SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_L"));
+	}
+	else {
+		SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_R"));
+	}
+	bMissileOnLeftPylon = !bMissileOnLeftPylon;
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
 	//missile->EngageTarget(Target);
 }
