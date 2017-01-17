@@ -45,16 +45,21 @@ void AMissileCustom::BeginPlay()
 	Super::BeginPlay();
 	
 	//currentTarget = ;
-	AStaticMeshActor* Target = nullptr;
-	for (TActorIterator<AStaticMeshActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	AActor* Target = nullptr;
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 		// Same as with the Object Iterator, access the subclass instance with the * or -> operators.
-		AStaticMeshActor *Mesh = *ActorItr;
+		AActor *Mesh = *ActorItr;
 		if (Mesh->GetName() == "C5trans") {
 			Target = Mesh;
 		}
 	}
-
+	if (Target!=nullptr) {
+		EngageTarget(Target);
+	}
+	else {
+		Target = GetWorld()->GetFirstPlayerController()->GetPawn();
+	}
 	EngageTarget(Target);
 	FString message = "Target Accquired : " + currentTarget->GetName();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
