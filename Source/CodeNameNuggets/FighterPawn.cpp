@@ -3,6 +3,7 @@
 #include "CodeNameNuggets.h"
 #include "FighterPawn.h"
 #include "CustomExplosion_Aircraft.h"
+#include "MissileCustom.h"
 
 AFighterPawn::AFighterPawn()
 {
@@ -149,6 +150,8 @@ void AFighterPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveUp", this, &AFighterPawn::MoveUpInput);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AFighterPawn::MoveRightInput);
 	PlayerInputComponent->BindAxis("MoveYaw", this, &AFighterPawn::MoveYawInput);
+	PlayerInputComponent->BindAction("FireMissile", IE_Pressed, this, &AFighterPawn::FireMissile);
+	PlayerInputComponent->BindAction("FireGuns", IE_Pressed, this, &AFighterPawn::FireGuns);
 }
 
 /** manage aircraft thrust input*/
@@ -229,7 +232,14 @@ void AFighterPawn::MoveYawInput(float Val)
 
 void AFighterPawn::FireMissile() {
 	// define fire missile function
-
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player have fired!"));
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = Instigator;
+	FVector SpawnLocation = GetActorLocation() + PlaneMesh->GetSocketLocation(FName("Pylon_L"));
+	FRotator SpawnRotation = GetActorRotation();
+	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
+	//missile->EngageTarget(Target);
 }
 
 void AFighterPawn::FireGuns() {

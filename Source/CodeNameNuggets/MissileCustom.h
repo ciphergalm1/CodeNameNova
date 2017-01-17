@@ -16,7 +16,11 @@ class CODENAMENUGGETS_API AMissileCustom : public AActor
 	UPROPERTY(Category = mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* MissileTrailComponent;
 	
-public:	
+public:
+
+	// override the notifyhit function
+	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+
 	// Sets default values for this actor's properties
 	AMissileCustom();
 
@@ -43,6 +47,8 @@ private:
 	float currentAirSpeed;
 
 	float turnRate;
+
+	void boosting();
 
 	void SetTarget(AActor* target);
 

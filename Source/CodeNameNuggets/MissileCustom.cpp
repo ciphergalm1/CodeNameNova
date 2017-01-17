@@ -2,6 +2,7 @@
 
 #include "CodeNameNuggets.h"
 #include "MissileCustom.h"
+#include "CustomExplosion_Aircraft.h"
 
 
 // Sets default values
@@ -17,6 +18,7 @@ AMissileCustom::AMissileCustom()
 	}
 	RootComponent = MissileMeshComponent;
 	MissileMeshComponent->SetSimulatePhysics(true);
+	MissileMeshComponent->SetEnableGravity(false);
 	MissileMeshComponent->SetMobility(EComponentMobility::Movable);
 
 	ConstructorHelpers::FObjectFinder<UParticleSystem> missileTrailRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/P_MissileTrail.P_MissileTrail'"));
@@ -29,7 +31,7 @@ AMissileCustom::AMissileCustom()
 	MissileTrailComponent->bAutoActivate = true;
 
 	// set up the missile
-	currentAirSpeed = 8000.f;
+	currentAirSpeed = 500.f;
 	bHasHitTarget = false;
 	bHasBeenFired = false;
 
@@ -42,16 +44,33 @@ void AMissileCustom::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	currentTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
-	Fire();
+	//currentTarget = ;
+	AStaticMeshActor* Target = nullptr;
+	for (TActorIterator<AStaticMeshActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		// Same as with the Object Iterator, access the subclass instance with the * or -> operators.
+		AStaticMeshActor *Mesh = *ActorItr;
+		if (Mesh->GetName() == "C5trans") {
+			Target = Mesh;
+		}
+	}
+
+	EngageTarget(Target);
+	FString message = "Target Accquired : " + currentTarget->GetName();
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+	//Fire();
 }
 
 // Called every frame
 void AMissileCustom::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	if (bHasBeenFired&&(!bHasHitTarget)) {
-		Homing(currentTarget);
+	if (bHasBeenFired) {
+		boosting();
+
+		if (!bHasHitTarget) {
+			Homing(currentTarget);
+		}
 	}
 }
 
@@ -61,6 +80,12 @@ void AMissileCustom::EngageTarget(AActor * target)
 	SetTarget(target);
 	//fire the missile
 	Fire();
+}
+
+void AMissileCustom::boosting()
+{
+	FVector movment = FVector(currentAirSpeed, 0.f, 0.f);
+	AddActorLocalOffset(movment*GetWorld()->GetDeltaSeconds());
 }
 
 void AMissileCustom::SetTarget(AActor * target)
@@ -80,7 +105,25 @@ void AMissileCustom::Homing(AActor * target)
 void AMissileCustom::Fire()
 {
 	bHasBeenFired = true;
-	FVector movingTarget = FVector(currentAirSpeed, 0.f, 0.f);
-	AddActorLocalOffset(movingTarget);
+	//FVector movment = FVector(currentAirSpeed, 0.f, 0.f);
+	//AddActorLocalOffset(movment);
 }
 
+void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+
+	UWorld* const world = GetWorld();
+
+	//check world
+	if (world) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+		world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+	}
+	bHasHitTarget = true;
+}
