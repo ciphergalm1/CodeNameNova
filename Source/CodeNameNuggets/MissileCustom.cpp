@@ -60,12 +60,12 @@ void AMissileCustom::BeginPlay()
 		}
 	}
 	if (Target!=nullptr) {
-		EngageTarget(Target);
+		EngageTarget(Target, GetName());
 	}
 	else {
 		Target = GetWorld()->GetFirstPlayerController()->GetPawn();
 	}
-	EngageTarget(Target);
+	EngageTarget(Target, GetName());
 	FString message = "Target Accquired : " + currentTarget->GetName();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 	//Fire();
@@ -99,10 +99,12 @@ void AMissileCustom::Tick( float DeltaTime )
 	}
 }
 
-void AMissileCustom::EngageTarget(AActor * target)
+void AMissileCustom::EngageTarget(AActor * target, FString newMissileOwner)
 {
-	//set the target
+	// set the target
 	SetTarget(target);
+	// set the owner of the missile
+	MissileOwner = newMissileOwner;
 	//fire the missile
 	Fire();
 }
@@ -147,18 +149,27 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	UWorld* const world = GetWorld();
-
-	//check world
-	if (world) {
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = Instigator;
-		FVector SpawnLocation = GetActorLocation();
-		FRotator SpawnRotation = GetActorRotation();
-		world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
-		SelfDestruction();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+	if (MissileOwner.Equals(Other->GetName())) {
+		UWorld* const world = GetWorld();
+		FString messageOwner = "Owner: " + MissileOwner;
+		FString messagehit = "Hit: " + Other->GetName();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+	
+		//check world
+		if (world) {
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = Instigator;
+			FVector SpawnLocation = GetActorLocation();
+			FRotator SpawnRotation = GetActorRotation();
+			world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
+			SelfDestruction();
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+		}
+		bHasHitTarget = true;
 	}
-	bHasHitTarget = true;
+	
+
+	
 }

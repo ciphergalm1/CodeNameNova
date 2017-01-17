@@ -18,11 +18,10 @@ AEnemyPawn::AEnemyPawn()
 	EnemyMesh->ComponentTags.Push(FName("EnemyAircraft"));
 	RootComponent = EnemyMesh;
 	EnemyMesh->SetSimulatePhysics(true);
+	EnemyMesh->SetEnableGravity(false);
 
 	// set up enemy aircraft movment
 	CurrentAirSpeed = 6000.f;
-	enemyAttitude = FRotator(0.f,-30.0f,0.f);
-	AddActorLocalRotation(enemyAttitude);
 }
 
 // Called when the game starts or when spawned
@@ -51,8 +50,11 @@ void AEnemyPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 void AEnemyPawn::FlyInCircle()
 {
-	FVector movingOffset = FVector(CurrentAirSpeed, 10*FMath::Sqrt(3.0f), 10.f);
-	AddActorLocalOffset(movingOffset);
+	FVector movingOffset = FVector(CurrentAirSpeed, 0.f, 0.f);
+	AddActorLocalOffset(movingOffset*GetWorld()->GetDeltaSeconds());
+
+	enemyAttitude = FRotator(20.f, 0.f, 0.f);
+	AddActorLocalRotation(enemyAttitude*GetWorld()->GetDeltaSeconds());
 }
 
 void AEnemyPawn::FireControl()
@@ -73,7 +75,7 @@ void AEnemyPawn::AttackTarget(AActor * Target)
 	FVector SpawnLocation = GetActorLocation() + EnemyMesh->GetSocketLocation(FName("Pylon_Main"));
 	FRotator SpawnRotation = GetActorRotation();
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
-	missile->EngageTarget(Target);
+	missile->EngageTarget(Target, GetName());
 }
 
 bool AEnemyPawn::CanAttack()
