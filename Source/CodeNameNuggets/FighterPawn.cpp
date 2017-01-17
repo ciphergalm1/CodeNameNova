@@ -120,8 +120,8 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 		SpawnExplosion();
 		EngineSoundComponent->SetVolumeMultiplier(0.0f);
 		EngineSoundComponent->SetPaused(true);
-		//EngineSoundComponent->PlaybackCompleted(EngineSoundComponent->GetAudioComponentID(),false);
-		//EngineSoundComponent->FadeOut(.5f, .0f);
+		EngineSoundComponent->PlaybackCompleted(EngineSoundComponent->GetAudioComponentID(),false);
+		EngineSoundComponent->FadeOut(.5f, .0f);
 		EngineSoundComponent->Stop();
 		EngineSoundComponent->Deactivate();
 		EngineSoundComponent->DestroyComponent();

@@ -31,7 +31,7 @@ AMissileCustom::AMissileCustom()
 	MissileTrailComponent->bAutoActivate = true;
 
 	// set up the missile
-	currentAirSpeed = 3000.f;
+	currentAirSpeed = 5000.f;
 	bHasHitTarget = false;
 	bHasBeenFired = false;
 
