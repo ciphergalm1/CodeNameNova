@@ -25,6 +25,10 @@ class CODENAMENUGGETS_API AFighterPawn : public APawn
 	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* EngineSoundComponent;
 
+	UPROPERTY(Category = VFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystemComponent* AfterBurnerComponent;
+
+
 public:
 	// Sets default values for this pawn's properties
 	AFighterPawn();
@@ -176,6 +180,9 @@ private:
 
 	// Handling Sound ManageMent
 	void ConfigEngineSound();
+
+	// Handling AfterBurner Effect
+	void ConfigAfterBurner();
 
 	
 };

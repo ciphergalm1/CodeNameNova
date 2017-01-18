@@ -68,6 +68,16 @@ AFighterPawn::AFighterPawn()
 		EngineSoundComponent->Activate();
 	}
 
+	// setting up the afterburner component
+	ConstructorHelpers::FObjectFinder<UParticleSystem> afterBurnerRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/P_AfterBurner.P_AfterBurner'"));
+	AfterBurnerComponent = CreateDefaultSubobject<UParticleSystemComponent>("Afterburner component");
+	if (afterBurnerRef.Succeeded()) {
+		AfterBurnerComponent->SetTemplate(afterBurnerRef.Object);
+		AfterBurnerComponent->SetupAttachment(RootComponent,FName("AfterBurner"));
+	}
+
+
+
 	// Setting aircraft parameters
 	isAlive = true;
 	Acceleration = 400.f;
@@ -84,6 +94,8 @@ AFighterPawn::AFighterPawn()
 
 void AFighterPawn::Tick(float DeltaSeconds)
 {
+
+
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
 
 	// check component tag
@@ -105,6 +117,9 @@ void AFighterPawn::Tick(float DeltaSeconds)
 
 	// Rotate plane
 	AddActorLocalRotation(DeltaRotation);
+
+	// config afterburnerEffect
+	ConfigAfterBurner();
 
 	// Call any parent class Tick implementation
 	Super::Tick(DeltaSeconds);
@@ -181,6 +196,8 @@ void AFighterPawn::ThrustInput(float Val)
 
 	CurrentThrustRatio = (CurrentForwardSpeed - MinSpeed )/ SpeedDelta;
 	ConfigEngineSound();
+
+
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(CurrentThrustRatio));
 	FVector gVector = FVector(0,0,-9.8);
 	if(CurrentThrustRatio<.4)
@@ -329,5 +346,20 @@ void AFighterPawn::ConfigEngineSound()
 	if (isAlive) {
 		float audioPitch = CurrentThrustRatio*0.6 + 0.8;
 		EngineSoundComponent->SetPitchMultiplier(audioPitch);
+	}
+}
+
+void AFighterPawn::ConfigAfterBurner()
+{
+	if (isAlive) {
+		/*
+		AfterBurnerComponent
+		CurrentThrustRatio
+		*/
+
+		float outputRatio = CurrentThrustRatio * 2;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(outputRatio));
+		outputRatio = FMath::Clamp<float>(outputRatio, 0.1, 2.0);
+		AfterBurnerComponent->SetFloatParameter(FName("AfterBurnerRatio"), outputRatio);
 	}
 }
