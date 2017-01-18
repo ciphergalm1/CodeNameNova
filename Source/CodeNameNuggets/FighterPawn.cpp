@@ -358,7 +358,7 @@ void AFighterPawn::ConfigAfterBurner()
 		*/
 
 		float outputRatio = CurrentThrustRatio * 2;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(outputRatio));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(outputRatio));
 		outputRatio = FMath::Clamp<float>(outputRatio, 0.1, 2.0);
 		AfterBurnerComponent->SetFloatParameter(FName("AfterBurnerRatio"), outputRatio);
 	}
