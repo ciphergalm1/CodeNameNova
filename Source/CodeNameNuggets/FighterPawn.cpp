@@ -129,7 +129,7 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You plane hit something!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You plane hit something!"));
 	// Destroy the pawn if player hit the ground
 	if (Other->ActorHasTag("Terrain")) {
 		// emit the explosion
@@ -146,7 +146,7 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 	}
 
 	if (Other->ActorHasTag("Aircraft")) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit an C-5!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit an C-5!"));
 		ReceiveDamage(10.0f);
 	}
 	
@@ -319,7 +319,7 @@ void AFighterPawn::ReceiveDamage(float damageVal)
 {
 	FString hitMessage = "You got hit by :";
 	hitMessage += FString::SanitizeFloat(damageVal);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, hitMessage);
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, hitMessage);
 	aircraftHP -= damageVal;
 }
 

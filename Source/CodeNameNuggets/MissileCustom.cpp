@@ -67,7 +67,7 @@ void AMissileCustom::BeginPlay()
 	}
 	EngageTarget(Target, GetName());
 	FString message = "Target Accquired : " + currentTarget->GetName();
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 	//Fire();
 }
 
@@ -78,7 +78,7 @@ void AMissileCustom::Tick( float DeltaTime )
 
 	fLifeTime += GetWorld()->GetDeltaSeconds();
 	if (fLifeTime > fLifeTimeMax) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Missile running out of fuel!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Missile running out of fuel!"));
 		Destroy();
 	}
 
@@ -92,7 +92,7 @@ void AMissileCustom::Tick( float DeltaTime )
 		if (bStartDestruction) {
 			SelfDestructionTimer -= GetWorld()->GetDeltaSeconds();
 			if (SelfDestructionTimer<0) {
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Missile is gone!"));
+				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Missile is gone!"));
 				Destroy();
 			}
 		}
@@ -153,8 +153,8 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 		UWorld* const world = GetWorld();
 		FString messageOwner = "Owner: " + MissileOwner;
 		FString messagehit = "Hit: " + Other->GetName();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 	
 		//check world
 		if (world) {
@@ -165,7 +165,7 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 			FRotator SpawnRotation = GetActorRotation();
 			world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
 			SelfDestruction();
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
 		}
 		bHasHitTarget = true;
 	}
