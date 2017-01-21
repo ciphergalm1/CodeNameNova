@@ -28,6 +28,8 @@ class CODENAMENUGGETS_API AFighterPawn : public APawn
 	UPROPERTY(Category = VFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* AfterBurnerComponent;
 
+	UPROPERTY(Category = PlayerContoller, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class APlayerController* CurrentPlayerController;
 
 public:
 	// Sets default values for this pawn's properties
@@ -63,6 +65,8 @@ protected:
 	void FireGuns();
 
 	bool bMissileOnLeftPylon;
+
+	UForceFeedbackEffect* EngineViberation;
 
 	/*
 	UPROPERTY(Category =  Spawn, BlueprintReadWrite)
@@ -181,8 +185,13 @@ private:
 	// Handling Sound ManageMent
 	void ConfigEngineSound();
 
+	// Handling Engine Viberation
+	void ConfigEngineViberation();
+
 	// Handling AfterBurner Effect
 	void ConfigAfterBurner();
+
+	
 
 	
 };

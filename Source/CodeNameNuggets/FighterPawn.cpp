@@ -7,6 +7,8 @@
 
 AFighterPawn::AFighterPawn()
 {
+	CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+
 	// Structure to hold one-time initialization
 	struct FConstructorStatics
 	{
@@ -76,6 +78,8 @@ AFighterPawn::AFighterPawn()
 		AfterBurnerComponent->SetupAttachment(RootComponent,FName("AfterBurner"));
 	}
 
+	// setting up the engine viberation
+	
 
 
 	// Setting aircraft parameters
@@ -347,6 +351,10 @@ void AFighterPawn::ConfigEngineSound()
 		float audioPitch = CurrentThrustRatio*0.6 + 0.8;
 		EngineSoundComponent->SetPitchMultiplier(audioPitch);
 	}
+}
+
+void AFighterPawn::ConfigEngineViberation()
+{
 }
 
 void AFighterPawn::ConfigAfterBurner()
