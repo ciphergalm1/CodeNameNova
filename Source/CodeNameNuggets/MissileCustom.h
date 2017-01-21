@@ -13,8 +13,11 @@ class CODENAMENUGGETS_API AMissileCustom : public AActor
 	UPROPERTY(Category = mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* MissileMeshComponent;
 
-	UPROPERTY(Category = mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = VFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* MissileTrailComponent;
+
+	UPROPERTY(Category = SFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* MissileSoundComponent;
 	
 public:
 
@@ -65,6 +68,8 @@ private:
 	void Fire();
 
 	void SelfDestruction();
+
+	void SpawnExplosion();
 
 
 	

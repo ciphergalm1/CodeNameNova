@@ -30,6 +30,16 @@ AMissileCustom::AMissileCustom()
 	MissileTrailComponent->SetupAttachment(RootComponent, FName("tail"));
 	MissileTrailComponent->bAutoActivate = true;
 
+	// set up missile sound
+	ConstructorHelpers::FObjectFinder<USoundCue> missileSoundRef(TEXT("SoundCue'/Game/SFX/MissileSound/MissileEngine_Cue.MissileEngine_Cue'"));
+	MissileSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Missile Sound"));
+	if (missileSoundRef.Succeeded()) {
+		MissileSoundComponent->SetSound(missileSoundRef.Object);
+	}
+	MissileSoundComponent->SetupAttachment(RootComponent, FName("tail"));
+	MissileSoundComponent->bAutoActivate = true;
+	MissileSoundComponent->Play();
+
 	// set up the missile
 	currentAirSpeed = 8000.f;
 	bHasHitTarget = false;
@@ -51,14 +61,6 @@ void AMissileCustom::BeginPlay()
 	//currentTarget = ;
 	AActor* Target = nullptr;
 	fLifeTime = 0.f;
-	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
-		// Same as with the Object Iterator, access the subclass instance with the * or -> operators.
-		AActor *Mesh = *ActorItr;
-		if (Mesh->GetName() == "C5trans") {
-			Target = Mesh;
-		}
-	}
 	if (Target!=nullptr) {
 		EngageTarget(Target, GetName());
 	}
@@ -79,6 +81,7 @@ void AMissileCustom::Tick( float DeltaTime )
 	fLifeTime += GetWorld()->GetDeltaSeconds();
 	if (fLifeTime > fLifeTimeMax) {
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Missile running out of fuel!"));
+		SpawnExplosion();
 		Destroy();
 	}
 
@@ -145,28 +148,35 @@ void AMissileCustom::SelfDestruction()
 	}
 }
 
+void AMissileCustom::SpawnExplosion()
+{
+	UWorld* const world = GetWorld();
+	if (world) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+		world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
+	}
+}
+
 void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
 	if (MissileOwner.Equals(Other->GetName())) {
-		UWorld* const world = GetWorld();
+		
 		FString messageOwner = "Owner: " + MissileOwner;
 		FString messagehit = "Hit: " + Other->GetName();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 	
 		//check world
-		if (world) {
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.Instigator = Instigator;
-			FVector SpawnLocation = GetActorLocation();
-			FRotator SpawnRotation = GetActorRotation();
-			world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
-			SelfDestruction();
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
-		}
+		SpawnExplosion();
+		SelfDestruction();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+		
 		bHasHitTarget = true;
 	}
 	

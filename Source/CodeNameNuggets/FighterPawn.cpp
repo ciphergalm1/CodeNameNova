@@ -43,20 +43,16 @@ AFighterPawn::AFighterPawn()
 	SpringArm->TargetArmLength = 1000.0f;		// The camera follows at this distance behind the character	
 	SpringArm->SocketOffset = FVector(0.f, 0.f, 300.f);      // Adding socket to the spring arm ( for camera offset)
 	SpringArm->bEnableCameraLag = true;
-	SpringArm->bUseControllerViewRotation = false;
 	SpringArm->CameraLagSpeed = 5.f;
 	
 
 	// Create camera component 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
-	Camera->bUseControllerViewRotation = false;
 	Camera->bUsePawnControlRotation = false; // Don't rotate camera with controller
 
 	// Get Engine Sound Ref
-	static ConstructorHelpers::FObjectFinder<USoundCue> EngineSoundRef(
-		TEXT("SoundCue'/Game/Assets/SFX/EngineSound/MiG-21_ENG.MiG-21_ENG'")
-	);
+	static ConstructorHelpers::FObjectFinder<USoundCue> EngineSoundRef(TEXT("SoundCue'/Game/SFX/EngineSound/MiG-21_ENG.MiG-21_ENG'"));
 
 	EngineSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSoundObj"));
 	EngineSoundComponent->SetupAttachment(RootComponent);

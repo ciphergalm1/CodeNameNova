@@ -24,7 +24,7 @@ ACustomExplosion_Aircraft::ACustomExplosion_Aircraft()
 	RootComponent = ExplosionEffectComponent;
 
 	// initialize the explosion sound component
-	ConstructorHelpers::FObjectFinder<USoundCue> soundRef(TEXT("SoundCue'/Game/Assets/SFX/Explosion/Explosion_Cue.Explosion_Cue'"));
+	ConstructorHelpers::FObjectFinder<USoundCue> soundRef(TEXT("SoundCue'/Game/SFX/Explosion/Explosion_Cue.Explosion_Cue'"));
 	ExplosionSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound"));
 	if (soundRef.Succeeded()) {
 		ExplosionSoundComponent->SetSound(soundRef.Object);
