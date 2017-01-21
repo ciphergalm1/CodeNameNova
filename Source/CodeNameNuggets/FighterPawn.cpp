@@ -7,7 +7,7 @@
 
 AFighterPawn::AFighterPawn()
 {
-	CurrentPlayerController = GetWorld()->GetFirstPlayerController();
+	//CurrentPlayerController = GetWorld()->GetFirstPlayerController();
 
 	// Structure to hold one-time initialization
 	struct FConstructorStatics

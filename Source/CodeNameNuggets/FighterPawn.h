@@ -28,8 +28,10 @@ class CODENAMENUGGETS_API AFighterPawn : public APawn
 	UPROPERTY(Category = VFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* AfterBurnerComponent;
 
+	/*
 	UPROPERTY(Category = PlayerContoller, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class APlayerController* CurrentPlayerController;
+	*/
 
 public:
 	// Sets default values for this pawn's properties
