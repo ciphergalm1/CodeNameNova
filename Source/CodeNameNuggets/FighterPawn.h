@@ -40,6 +40,8 @@ public:
 	// Begin AActor overrides
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+
+	// Called when the game starts or when spawned
 	// End AActor overrides
 
 protected:
@@ -59,6 +61,12 @@ protected:
 
 	/** Bound to the Yaw axis */
 	void MoveYawInput(float Val);
+
+	/** Bound to camera Y axis */
+	void CameraUpInput(float Val);
+
+	/** Bound to camera X axis */
+	void CameraRightInput(float Val);
 
 	/** Bound to the Fire Missile button */
 	void FireMissile();
@@ -111,6 +119,12 @@ private:
 
 	/** Current roll speed */
 	float CurrentRollSpeed;
+
+	/** Current Camera Pitch */
+	float CurrentCameraPitch;
+
+	/** Current Camera Yaw */
+	float CurrentCameraYaw;
 
 	/** Set up thurst */
 	UPROPERTY(Category = Plane, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

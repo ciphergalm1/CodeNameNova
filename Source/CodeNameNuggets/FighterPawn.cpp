@@ -43,12 +43,14 @@ AFighterPawn::AFighterPawn()
 	SpringArm->TargetArmLength = 1000.0f;		// The camera follows at this distance behind the character	
 	SpringArm->SocketOffset = FVector(0.f, 0.f, 300.f);      // Adding socket to the spring arm ( for camera offset)
 	SpringArm->bEnableCameraLag = true;
+	SpringArm->bUseControllerViewRotation = false;
 	SpringArm->CameraLagSpeed = 5.f;
 	
 
 	// Create camera component 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	Camera->bUseControllerViewRotation = false;
 	Camera->bUsePawnControlRotation = false; // Don't rotate camera with controller
 
 	// Get Engine Sound Ref
@@ -122,6 +124,18 @@ void AFighterPawn::Tick(float DeltaSeconds)
 	// Rotate plane
 	AddActorLocalRotation(DeltaRotation);
 
+	// Rotate Camera
+	FRotator newCameraRotator(0, 0, 0);
+	newCameraRotator.Yaw = CurrentCameraYaw;
+	newCameraRotator.Pitch = CurrentCameraPitch;
+	
+	SpringArm->RelativeRotation = newCameraRotator;
+	/*
+	FHitResult hit;
+	SpringArm->K2_SetRelativeRotation(newCameraRotator, false, hit, false);
+	*/
+
+
 	// config afterburnerEffect
 	ConfigAfterBurner();
 
@@ -170,6 +184,8 @@ void AFighterPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveUp", this, &AFighterPawn::MoveUpInput);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AFighterPawn::MoveRightInput);
 	PlayerInputComponent->BindAxis("MoveYaw", this, &AFighterPawn::MoveYawInput);
+	PlayerInputComponent->BindAxis("CameraUp", this, &AFighterPawn::CameraUpInput);
+	PlayerInputComponent->BindAxis("CameraRight", this, &AFighterPawn::CameraRightInput);
 	PlayerInputComponent->BindAction("FireMissile", IE_Pressed, this, &AFighterPawn::FireMissile);
 	PlayerInputComponent->BindAction("FireGuns", IE_Pressed, this, &AFighterPawn::FireGuns);
 }
@@ -252,6 +268,20 @@ void AFighterPawn::MoveYawInput(float Val)
 	CurrentYawSpeed = FMath::FInterpTo(CurrentYawSpeed, TargetYawSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 }
 
+void AFighterPawn::CameraUpInput(float Val)
+{
+	// setting new rotation to the spring arm
+	// SpringArm
+	CurrentCameraPitch = FMath::FInterpTo(CurrentCameraPitch, 180 * Val, GetWorld()->GetDeltaSeconds(), 2.f);
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("up and down"));
+}
+
+void AFighterPawn::CameraRightInput(float Val)
+{
+	CurrentCameraYaw = FMath::FInterpTo(CurrentCameraYaw, 180 * Val, GetWorld()->GetDeltaSeconds(), 2.f);
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("right and left"));
+}
+
 void AFighterPawn::FireMissile() {
 	// define fire missile function
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player have fired!"));
@@ -273,7 +303,7 @@ void AFighterPawn::FireMissile() {
 
 void AFighterPawn::FireGuns() {
 	// define fire guns function
-
+	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have pushed the gun button and nothing happened!"));
 }
 
 float AFighterPawn::GetAirSpeed() const
