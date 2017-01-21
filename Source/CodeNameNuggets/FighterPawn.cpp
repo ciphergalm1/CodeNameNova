@@ -352,14 +352,14 @@ void AFighterPawn::ConfigEngineSound()
 void AFighterPawn::ConfigAfterBurner()
 {
 	if (isAlive) {
-		/*
-		AfterBurnerComponent
-		CurrentThrustRatio
-		*/
 
+		// controll the engine effect
 		float outputRatio = CurrentThrustRatio * 5.0f;
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(outputRatio));
 		outputRatio = FMath::Clamp<float>(outputRatio, 0.1f, 5.0f);
+		float distortionRatio = CurrentThrustRatio * 8.0f;
+		distortionRatio = FMath::Clamp<float>(distortionRatio, 0.1f, 8.0f);
 		AfterBurnerComponent->SetFloatParameter(FName("AfterBurnerRatio"), outputRatio);
+		AfterBurnerComponent->SetFloatParameter(FName("DistortionLifeTime"), distortionRatio);
 	}
 }
