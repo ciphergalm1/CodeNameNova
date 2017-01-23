@@ -51,6 +51,8 @@ private:
 
 	bool bStartDestruction;
 
+	bool bHasTarget;
+
 	float fLifeTime;
 
 	float fLifeTimeMax;

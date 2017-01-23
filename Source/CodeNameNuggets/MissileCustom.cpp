@@ -44,6 +44,7 @@ AMissileCustom::AMissileCustom()
 	currentAirSpeed = 8000.f;
 	bHasHitTarget = false;
 	bHasBeenFired = false;
+	bHasTarget = false;
 
 	SelfDestructionTimer = 3.0f;
 	
@@ -57,20 +58,9 @@ AMissileCustom::AMissileCustom()
 void AMissileCustom::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	//currentTarget = ;
-	AActor* Target = nullptr;
 	fLifeTime = 0.f;
-	if (Target!=nullptr) {
-		EngageTarget(Target, GetName());
-	}
-	else {
-		Target = GetWorld()->GetFirstPlayerController()->GetPawn();
-	}
-	EngageTarget(Target, GetName());
-	FString message = "Target Accquired : " + currentTarget->GetName();
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
-	//Fire();
 }
 
 // Called every frame
@@ -88,7 +78,7 @@ void AMissileCustom::Tick( float DeltaTime )
 	if (bHasBeenFired) {
 		Boosting();
 
-		if (!bHasHitTarget) {
+		if (bHasTarget&&!bHasHitTarget) {
 			Homing(currentTarget);
 		}
 		else {
@@ -125,16 +115,19 @@ void AMissileCustom::SetTarget(AActor * target)
 {
 	if (target != nullptr) {
 		currentTarget = target;
+		bHasTarget = true;
 	}
 }
 
 void AMissileCustom::Homing(AActor * target)
 {
-	FVector currentLocation = GetActorLocation();
-	FVector targetLocation = target->GetActorLocation();
-	FVector targetVector = targetLocation - currentLocation;
-	FVector NewVector = FMath::VInterpNormalRotationTo(GetActorForwardVector(),targetVector,GetWorld()->GetDeltaSeconds(),turnRate);
-	SetActorRotation(NewVector.Rotation());
+	if (bHasTarget) {
+		FVector currentLocation = GetActorLocation();
+		FVector targetLocation = target->GetActorLocation();
+		FVector targetVector = targetLocation - currentLocation;
+		FVector NewVector = FMath::VInterpNormalRotationTo(GetActorForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
+		SetActorRotation(NewVector.Rotation());
+	}
 }
 
 void AMissileCustom::Fire()
@@ -184,6 +177,15 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 		bHasHitTarget = true;
 	}
 	else {
+		//FString messageOwner = "Missile owner: " + MissileOwner;
+		//FString messagehit = " Hit target: " + Other->GetName();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+		//SpawnExplosion();
+		//SelfDestruction();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+
+		//bHasHitTarget = true;
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Something went wrong on AMissileCustom::NotifyHit"));
 	}
 	

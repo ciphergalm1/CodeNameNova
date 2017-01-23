@@ -21,11 +21,13 @@ AEnemyPawn::AEnemyPawn()
 	
 	RootComponent = EnemyMesh;
 	EnemyMesh->SetSimulatePhysics(true);
-	
 	EnemyMesh->SetEnableGravity(false);
 
 	// set up enemy aircraft movment
 	CurrentAirSpeed = 6000.f;
+
+	currentAttackTimer = 0.f;
+	AttackInterval = 15.f;
 }
 
 // Called when the game starts or when spawned
@@ -76,7 +78,7 @@ void AEnemyPawn::AttackTarget(AActor * Target)
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = Instigator;
-	FVector SpawnLocation = GetActorLocation() + EnemyMesh->GetSocketLocation(FName("Pylon_Main"));
+	FVector SpawnLocation = EnemyMesh->GetSocketLocation(FName("Pylon_Main"));
 	FRotator SpawnRotation = GetActorRotation();
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
 	missile->EngageTarget(Target, GetName());
@@ -85,7 +87,7 @@ void AEnemyPawn::AttackTarget(AActor * Target)
 bool AEnemyPawn::CanAttack()
 {
 	bool result = false;
-	result = (currentAttackTimer < AttackInterval) ? true : false;
+	result = (currentAttackTimer > AttackInterval) ? true : false;
 	return result;
 }
 
