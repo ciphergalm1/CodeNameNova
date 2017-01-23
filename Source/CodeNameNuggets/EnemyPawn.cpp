@@ -16,8 +16,12 @@ AEnemyPawn::AEnemyPawn()
 		EnemyMesh->SetStaticMesh(enemyMeshRef.Object);
 	}
 	EnemyMesh->ComponentTags.Push(FName("EnemyAircraft"));
+	Tags.Push(FName("EnemyAircraft"));
+	Tags.Insert(FName("EnemyAircraft"), 0);
+	
 	RootComponent = EnemyMesh;
 	EnemyMesh->SetSimulatePhysics(true);
+	
 	EnemyMesh->SetEnableGravity(false);
 
 	// set up enemy aircraft movment

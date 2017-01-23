@@ -91,6 +91,9 @@ void AMissileCustom::Tick( float DeltaTime )
 		if (!bHasHitTarget) {
 			Homing(currentTarget);
 		}
+		else {
+			bStartDestruction = true;
+		}
 
 		if (bStartDestruction) {
 			SelfDestructionTimer -= GetWorld()->GetDeltaSeconds();
@@ -120,7 +123,9 @@ void AMissileCustom::Boosting()
 
 void AMissileCustom::SetTarget(AActor * target)
 {
-	currentTarget = target;
+	if (target != nullptr) {
+		currentTarget = target;
+	}
 }
 
 void AMissileCustom::Homing(AActor * target)
@@ -165,19 +170,21 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	if (MissileOwner.Equals(Other->GetName())) {
+	if (!MissileOwner.Equals(Other->GetName())) {
 		
-		FString messageOwner = "Owner: " + MissileOwner;
-		FString messagehit = "Hit: " + Other->GetName();
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+		FString messageOwner = "Missile Owner: " + MissileOwner;
+		FString messagehit = " Hit: " + Other->GetName();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 	
-		//check world
 		SpawnExplosion();
 		SelfDestruction();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
 		
 		bHasHitTarget = true;
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Something went wrong on AMissileCustom::NotifyHit"));
 	}
 	
 

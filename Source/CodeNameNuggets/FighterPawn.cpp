@@ -88,6 +88,13 @@ AFighterPawn::AFighterPawn()
 	MinSpeed = 3000.f;
 	CurrentForwardSpeed = 1000.f;
 	CurrentYawSpeed = 0.0f;
+
+	/* set the weapon lock capability */
+	DetectDistance = 40000.f;
+	DetectionShape = FCollisionShape();
+	DetectionShape.SetCapsule(600.f,5000.f);
+	CurrentTarget = nullptr;
+
 	aircraftHP = 100.f;
 	SpeedDelta = MaxSpeed - MinSpeed;
 	NormalAirSpeed = (MinSpeed + MaxSpeed) / 2;
@@ -184,6 +191,7 @@ void AFighterPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("CameraRight", this, &AFighterPawn::CameraRightInput);
 	PlayerInputComponent->BindAction("FireMissile", IE_Pressed, this, &AFighterPawn::FireMissile);
 	PlayerInputComponent->BindAction("FireGuns", IE_Pressed, this, &AFighterPawn::FireGuns);
+	PlayerInputComponent->BindAction("SearchTarget", IE_Pressed, this, &AFighterPawn::SearchTarget);
 }
 
 /** manage aircraft thrust input*/
@@ -280,6 +288,33 @@ void AFighterPawn::CameraRightInput(float Val)
 
 void AFighterPawn::SearchTarget()
 {
+	TArray<FHitResult> HitResults;
+	FVector StartPos = PlaneMesh->GetSocketLocation(FName("Nose"));
+	FVector EndPos = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectDistance;
+	FCollisionQueryParams CollisionParams;
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Start target searching!"));
+	FCollisionResponseParams ResponseParams;
+
+	if (CurrentTarget==nullptr) {
+		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos,  GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
+		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green,false, 10.f);
+		if (bHasDetecTarget) {
+			for (auto it = HitResults.CreateIterator(); it; it++) {
+				FVector targetLocation = (*it).Actor->GetActorLocation();
+				FString targetName = (*it).Actor->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, targetName);
+				DrawDebugSphere(GetWorld(), targetLocation, 500.f, 32, FColor::Green, false, 10.f);
+				if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
+					FString message = "Target Accquired: " + (*it).Actor->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+					AActor* target = (*it).GetActor();
+					CurrentTarget = Cast<APawn>(target);
+				}
+			}
+		}
+
+	}
 
 }
 
@@ -299,7 +334,8 @@ void AFighterPawn::FireMissile() {
 	}
 	bMissileOnLeftPylon = !bMissileOnLeftPylon;
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
-	//missile->EngageTarget(Target);
+	AActor* target = Cast<AActor>(CurrentTarget);
+	missile->EngageTarget(target, GetName());
 }
 
 void AFighterPawn::FireGuns() {
@@ -358,6 +394,11 @@ void AFighterPawn::ReceiveDamage(float damageVal)
 	hitMessage += FString::SanitizeFloat(damageVal);
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, hitMessage);
 	aircraftHP -= damageVal;
+}
+
+APawn* AFighterPawn::GetCurrentTarget()
+{
+	return CurrentTarget;
 }
 
 void AFighterPawn::SpawnExplosion()

@@ -159,6 +159,14 @@ private:
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float NormalAirSpeed;
 
+	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float DetectDistance;
+
+	struct FCollisionShape DetectionShape;
+
+	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class APawn* CurrentTarget;
+
 public:
 
 	/** Returns PlaneMesh subobject **/
@@ -195,6 +203,9 @@ public:
 
 	UFUNCTION(Category = Damage, BlueprintCallable)
 	void ReceiveDamage(float damageVal);
+
+	UFUNCTION(Category = UI, BlueprintPure)
+	class APawn* GetCurrentTarget();
 
 
 private:
