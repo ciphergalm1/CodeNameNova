@@ -278,6 +278,11 @@ void AFighterPawn::CameraRightInput(float Val)
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("right and left"));
 }
 
+void AFighterPawn::SearchTarget()
+{
+
+}
+
 void AFighterPawn::FireMissile() {
 	// define fire missile function
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player have fired!"));
@@ -300,6 +305,8 @@ void AFighterPawn::FireMissile() {
 void AFighterPawn::FireGuns() {
 	// define fire guns function
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have pushed the gun button and nothing happened!"));
+
+
 }
 
 float AFighterPawn::GetAirSpeed() const

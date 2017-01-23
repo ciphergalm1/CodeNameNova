@@ -68,6 +68,9 @@ protected:
 	/** Bound to camera X axis */
 	void CameraRightInput(float Val);
 
+	/** Search for target if current target is null */
+	void SearchTarget();
+
 	/** Bound to the Fire Missile button */
 	void FireMissile();
 
