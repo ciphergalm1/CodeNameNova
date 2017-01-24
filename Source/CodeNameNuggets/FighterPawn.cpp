@@ -92,7 +92,7 @@ AFighterPawn::AFighterPawn()
 	/* set the weapon lock capability */
 	DetectDistance = 40000.f;
 	DetectionShape = FCollisionShape();
-	DetectionShape = FCollisionShape::MakeCapsule(3000.f, 30000.f);
+	DetectionShape = FCollisionShape::MakeCapsule(5000.f, 30000.f);
 	//DetectionShape.SetCapsule(3000.f,30000.f);
 	CurrentTarget = nullptr;
 
@@ -293,25 +293,34 @@ void AFighterPawn::SearchTarget()
 	FVector StartPos = PlaneMesh->GetSocketLocation(FName("Nose"));
 	FVector EndPos = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectDistance;
 	FCollisionQueryParams CollisionParams;
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("----------------------------------------------------"));
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Start target searching!"));
 	FCollisionResponseParams ResponseParams;
 
+	/* Trying debug capsule */
+	//FVector center = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectDistance;
+	//DrawDebugCapsule(GetWorld(), center, 30000.f, 3000.f, PlaneMesh->GetComponentRotation().Quaternion(), FColor::Green, false, 10.f);
+
 	if (CurrentTarget==nullptr) {
 		
-		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos,  GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
-		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green,false, 10.f);
+		//bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos,  GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
+		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos, GetActorForwardVector().ToOrientationQuat(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
+		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
 		if (bHasDetecTarget) {
 			for (auto it = HitResults.CreateIterator(); it; it++) {
-				FVector targetLocation = (*it).Actor->GetActorLocation();
-				FString targetName = (*it).Actor->GetName();
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, targetName);
-				DrawDebugSphere(GetWorld(), targetLocation, 500.f, 32, FColor::Green, false, 10.f);
-				if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
-					FString message = "Target Accquired: " + (*it).Actor->GetName();
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
-					AActor* target = (*it).GetActor();
-					CurrentTarget = Cast<APawn>(target);
+				if ((*it).GetActor() != this) {
+					FVector targetLocation = (*it).Actor->GetActorLocation();
+					FString targetName = "Find target: " + (*it).Component->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, targetName);
+					DrawDebugSphere(GetWorld(), targetLocation, 500.f, 16, FColor::Green, false, 10.f);
+					if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
+						FString message = "Target Accquired: " + (*it).Actor->GetName();
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+						AActor* target = (*it).GetActor();
+						CurrentTarget = Cast<APawn>(target);
+
+					}
 				}
 			}
 		}
@@ -323,16 +332,18 @@ void AFighterPawn::SearchTarget()
 		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
 		if (bHasDetecTarget) {
 			for (auto it = HitResults.CreateIterator(); it; it++) {
-				FVector targetLocation = (*it).Actor->GetActorLocation();
-				FString targetName = (*it).Actor->GetName();
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, targetName);
-				DrawDebugSphere(GetWorld(), targetLocation, 500.f, 32, FColor::Green, false, 10.f);
-				if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
-					FString message = "Target Accquired: " + (*it).Actor->GetName();
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
-					AActor* target = (*it).GetActor();
-					CurrentTarget = Cast<APawn>(target);
+				if ((*it).GetActor() != this) {
+					FVector targetLocation = (*it).Actor->GetActorLocation();
+					FString targetName = "Find target: " + (*it).Actor->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, targetName);
+					DrawDebugSphere(GetWorld(), targetLocation, 500.f, 32, FColor::Green, false, 10.f);
+					if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
+						FString message = "Target Accquired: " + (*it).Actor->GetName();
+						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+						AActor* target = (*it).GetActor();
+						CurrentTarget = Cast<APawn>(target);
+					}
 				}
 			}
 		}
@@ -358,8 +369,8 @@ void AFighterPawn::FireMissile() {
 	}
 	bMissileOnLeftPylon = !bMissileOnLeftPylon;
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
-	AActor* target = Cast<AActor>(CurrentTarget);
-	missile->EngageTarget(target, GetName());
+	//AActor* target = Cast<AActor>(CurrentTarget);
+	missile->EngageTarget(CurrentTarget, this);
 }
 
 void AFighterPawn::FireGuns() {

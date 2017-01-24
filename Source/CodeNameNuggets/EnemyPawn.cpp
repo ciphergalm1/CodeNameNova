@@ -21,6 +21,9 @@ AEnemyPawn::AEnemyPawn()
 	
 	RootComponent = EnemyMesh;
 	EnemyMesh->SetSimulatePhysics(true);
+	EnemyMesh->bAutoActivate = true;
+	EnemyMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	EnemyMesh->SetComponentTickEnabled(true);
 	EnemyMesh->SetEnableGravity(false);
 
 	// set up enemy aircraft movment
@@ -35,6 +38,15 @@ void AEnemyPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	currentTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
+}
+
+void AEnemyPawn::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimitiveComponent * OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult & Hit)
+{
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+
+	FString message = "This is " + GetName();
+	message += ". I have been hit!";
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 }
 
 // Called every frame
@@ -81,7 +93,7 @@ void AEnemyPawn::AttackTarget(AActor * Target)
 	FVector SpawnLocation = EnemyMesh->GetSocketLocation(FName("Pylon_Main"));
 	FRotator SpawnRotation = GetActorRotation();
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
-	missile->EngageTarget(Target, GetName());
+	missile->EngageTarget(Target, this);
 }
 
 bool AEnemyPawn::CanAttack()

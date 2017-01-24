@@ -36,9 +36,9 @@ public:
 	UPROPERTY(Category = target, BlueprintReadWrite)
 	class AActor* currentTarget;
 
-	void EngageTarget(AActor* target, FString newMissileOwner);
+	void EngageTarget(AActor* target, APawn* newMissileOwner);
 
-	FString MissileOwner;
+	APawn* MissileOwner;
 
 private:
 

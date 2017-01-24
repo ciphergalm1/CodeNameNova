@@ -95,7 +95,7 @@ void AMissileCustom::Tick( float DeltaTime )
 	}
 }
 
-void AMissileCustom::EngageTarget(AActor * target, FString newMissileOwner)
+void AMissileCustom::EngageTarget(AActor * target, APawn* newMissileOwner)
 {
 	// set the target
 	SetTarget(target);
@@ -162,12 +162,13 @@ void AMissileCustom::SpawnExplosion()
 void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I hit something!"));
 
 	// check if the missile owner is not the target
-	if (!MissileOwner.Equals(Other->GetName())) {
+	if (currentTarget == Other) {
 		// do the explosion 
-		FString messageOwner = "Missile Owner: " + MissileOwner;
-		FString messagehit = " Hit: " + Other->GetName();
+		FString messageOwner = "Missile Owner: " + MissileOwner->GetName();
+		FString messagehit = " Hit Target: " + Other->GetName();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 	
@@ -179,9 +180,9 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 	}
 	else {
 		// handling error
-
-		FString messageOwner = "Missile owner: " + MissileOwner;
-		FString messagehit = " Hit target: " + Other->GetName();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Missile is not working correctly");
+		FString messageOwner = "Missile owner: " + MissileOwner->GetName();
+		FString messagehit = " Hit: " + Other->GetName();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 		//SpawnExplosion();
