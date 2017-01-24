@@ -44,7 +44,7 @@ void AEnemyPawn::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimit
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	FString message = "This is " + GetName();
+	FString message = "This is your enemy fighter pawn: " + GetName();
 	message += ". I have been hit!";
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 }
