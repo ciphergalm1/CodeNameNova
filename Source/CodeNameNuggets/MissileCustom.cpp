@@ -20,6 +20,7 @@ AMissileCustom::AMissileCustom()
 	MissileMeshComponent->SetSimulatePhysics(true);
 	MissileMeshComponent->SetEnableGravity(false);
 	MissileMeshComponent->SetMobility(EComponentMobility::Movable);
+	MissileMeshComponent->SetNotifyRigidBodyCollision(true);
 
 	ConstructorHelpers::FObjectFinder<UParticleSystem> missileTrailRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/P_MissileTrail.P_MissileTrail'"));
 	MissileTrailComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Missile Trail"));
@@ -164,41 +165,33 @@ void AMissileCustom::SpawnExplosion()
 void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I'm your missile and I hit something!"));
-	SpawnExplosion();
-	SelfDestruction();
+	//check if the missile owner is not the target
+	if (currentTarget == Other) {
+		// do the explosion
+		FString messageOwner = "Missile Owner: " + MissileOwner->GetName();
+		FString messagehit = " Hit Target: " + Other->GetName();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+
+		SpawnExplosion();
+		SelfDestruction();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+
+		bHasHitTarget = true;
+	}
+	else {
+		// handling error
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Missile is not working correctly");
+		FString messageOwner = "Missile owner: " + MissileOwner->GetName();
+		FString messagehit = " Hit: " + Other->GetName();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+		//SpawnExplosion();
+		//SelfDestruction();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+
+		//bHasHitTarget = true;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Something went wrong on AMissileCustom::NotifyHit"));
+	}
 }
-
-/*
-
-for notify hit
-//check if the missile owner is not the target
-if (currentTarget == Other) {
-// do the explosion
-FString messageOwner = "Missile Owner: " + MissileOwner->GetName();
-FString messagehit = " Hit Target: " + Other->GetName();
-GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
-GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
-
-SpawnExplosion();
-SelfDestruction();
-GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
-
-bHasHitTarget = true;
-}
-else {
-// handling error
-
-GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Missile is not working correctly");
-FString messageOwner = "Missile owner: " + MissileOwner->GetName();
-FString messagehit = " Hit: " + Other->GetName();
-GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
-GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
-//SpawnExplosion();
-//SelfDestruction();
-//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
-
-//bHasHitTarget = true;
-GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Something went wrong on AMissileCustom::NotifyHit"));
-}
-*/
