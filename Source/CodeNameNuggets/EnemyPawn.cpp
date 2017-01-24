@@ -44,7 +44,7 @@ void AEnemyPawn::Tick( float DeltaTime )
 	// manage attack timer;
 	currentAttackTimer += GetWorld()->GetDeltaSeconds();
 	FlyInCircle();
-	FireControl();
+	//FireControl();
 }
 
 // Called to bind functionality to input

@@ -92,7 +92,8 @@ AFighterPawn::AFighterPawn()
 	/* set the weapon lock capability */
 	DetectDistance = 40000.f;
 	DetectionShape = FCollisionShape();
-	DetectionShape.SetCapsule(600.f,5000.f);
+	DetectionShape = FCollisionShape::MakeCapsule(3000.f, 30000.f);
+	//DetectionShape.SetCapsule(3000.f,30000.f);
 	CurrentTarget = nullptr;
 
 	aircraftHP = 100.f;
@@ -296,6 +297,7 @@ void AFighterPawn::SearchTarget()
 	FCollisionResponseParams ResponseParams;
 
 	if (CurrentTarget==nullptr) {
+		
 		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos,  GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
 		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green,false, 10.f);
 		if (bHasDetecTarget) {
@@ -313,6 +315,28 @@ void AFighterPawn::SearchTarget()
 				}
 			}
 		}
+
+	}
+	else {
+		/**  replication of search target */
+		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos, GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
+		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
+		if (bHasDetecTarget) {
+			for (auto it = HitResults.CreateIterator(); it; it++) {
+				FVector targetLocation = (*it).Actor->GetActorLocation();
+				FString targetName = (*it).Actor->GetName();
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, targetName);
+				DrawDebugSphere(GetWorld(), targetLocation, 500.f, 32, FColor::Green, false, 10.f);
+				if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
+					FString message = "Target Accquired: " + (*it).Actor->GetName();
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+					AActor* target = (*it).GetActor();
+					CurrentTarget = Cast<APawn>(target);
+				}
+			}
+		}
+		/** replication over */
 
 	}
 
