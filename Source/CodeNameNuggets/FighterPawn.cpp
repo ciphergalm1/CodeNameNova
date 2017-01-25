@@ -4,7 +4,7 @@
 #include "FighterPawn.h"
 #include "CustomExplosion_Aircraft.h"
 #include "MissileCustom.h"
-#include "GunShell.cpp"
+#include "GunShell.h"
 
 AFighterPawn::AFighterPawn()
 {
@@ -227,7 +227,7 @@ void AFighterPawn::ThrustInput(float Val)
 
 
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::SanitizeFloat(CurrentThrustRatio));
-	FVector gVector = FVector(0,0,-9.8);
+	FVector gVector = 100 * FVector(0,0,-9.8);
 	if(CurrentThrustRatio<.4)
 	PlaneMesh->AddForce(gVector);
 
@@ -380,13 +380,13 @@ void AFighterPawn::FireMissile() {
 
 void AFighterPawn::FireGuns() {
 	// define fire guns function
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have pushed the gun button and nothing happened!"));
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have pushed the gun button"));
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = Instigator;
 	FRotator SpawnRotation = GetActorRotation();
 	FVector SpawnLocation = PlaneMesh->GetSocketLocation("Cannon");
-	//AGunShell* gunShell = GetWorld()->SpawnActor<AGunShell>(SpawnLocation, SpawnRotation, SpawnParams);
+	AGunShell* gunShell = GetWorld()->SpawnActor<AGunShell>(SpawnLocation, SpawnRotation, SpawnParams);
 
 }
 

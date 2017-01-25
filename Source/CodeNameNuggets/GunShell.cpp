@@ -12,6 +12,9 @@ AGunShell::AGunShell()
 
 	Shell = CreateDefaultSubobject<USphereComponent>(TEXT("Shell"));
 	RootComponent = Shell;
+	Shell->SetSimulatePhysics(true);
+	Shell->SetEnableGravity(false);
+	Shell->SetMobility(EComponentMobility::Movable);
 	Shell->SetNotifyRigidBodyCollision(true);
 
 	ConstructorHelpers::FObjectFinder<UParticleSystem> trailRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/ShellTrail.ShellTrail'"));
@@ -19,8 +22,11 @@ AGunShell::AGunShell()
 	if (trailRef.Succeeded()) {
 		ShellTrail->SetTemplate(trailRef.Object);
 	}
+	FVector trailScale = 20.f * FVector(1.0f, 1.0f, 1.0f);
+	ShellTrail->SetWorldScale3D(trailScale);
+	ShellTrail->SetupAttachment(RootComponent);
 
-	ShellSpeed = 9000.f;
+	ShellSpeed = 10000.f;
 }
 
 // Called when the game starts or when spawned
@@ -40,7 +46,7 @@ void AGunShell::Tick( float DeltaTime )
 void AGunShell::shellTravel()
 {
 	FVector move = ShellSpeed * FVector(1.0f, 0.f, 0.f);
-	AddActorLocalOffset(move);
+	AddActorLocalOffset(move*GetWorld()->GetDeltaSeconds());
 }
 
 void AGunShell::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
