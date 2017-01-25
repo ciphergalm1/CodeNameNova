@@ -11,7 +11,7 @@ class CODENAMENUGGETS_API AGunShell : public AActor
 	GENERATED_BODY()
 
 	UPROPERTY(Category = Shell, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USphereComponent* Shell;
+	class UStaticMeshComponent* Shell;
 
 	UPROPERTY(Category = Shell, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* ShellTrail;
@@ -35,6 +35,8 @@ private:
 
 	// handle shell movement
 	void shellTravel();
+
+	void SpawnExplosion();
 
 	
 };
