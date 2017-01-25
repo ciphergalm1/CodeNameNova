@@ -179,6 +179,13 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 
 		bHasHitTarget = true;
 	}
+	else if ( Other != MissileOwner ) {
+		SpawnExplosion();
+		SelfDestruction();
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Your missile hit something it is not supposed to hit!"));
+
+		bHasHitTarget = true;
+	}
 	else {
 		// handling error
 

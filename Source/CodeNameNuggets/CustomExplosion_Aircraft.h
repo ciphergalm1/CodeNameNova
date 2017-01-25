@@ -38,5 +38,7 @@ private:
 
 	// for handling the self destruction
 	bool bIsStillAlive();
+
+	class USoundCue* explosionCue;
 	
 };

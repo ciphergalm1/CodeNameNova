@@ -4,6 +4,7 @@
 #include "FighterPawn.h"
 #include "CustomExplosion_Aircraft.h"
 #include "MissileCustom.h"
+#include "GunShell.cpp"
 
 AFighterPawn::AFighterPawn()
 {
@@ -380,7 +381,12 @@ void AFighterPawn::FireMissile() {
 void AFighterPawn::FireGuns() {
 	// define fire guns function
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have pushed the gun button and nothing happened!"));
-
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = Instigator;
+	FRotator SpawnRotation = GetActorRotation();
+	FVector SpawnLocation = PlaneMesh->GetSocketLocation("Cannon");
+	//AGunShell* gunShell = GetWorld()->SpawnActor<AGunShell>(SpawnLocation, SpawnRotation, SpawnParams);
 
 }
 
