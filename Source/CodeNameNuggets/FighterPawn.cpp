@@ -97,6 +97,8 @@ AFighterPawn::AFighterPawn()
 	CurrentTarget = nullptr;
 
 	aircraftHP = 100.f;
+	MissileRemain = 152;
+
 	SpeedDelta = MaxSpeed - MinSpeed;
 	NormalAirSpeed = (MinSpeed + MaxSpeed) / 2;
 	bMissileOnLeftPylon = true;
@@ -328,6 +330,7 @@ void AFighterPawn::SearchTarget()
 	}
 	else {
 		/**  replication of search target */
+		CurrentTarget = nullptr;
 		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos, GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
 		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
 		if (bHasDetecTarget) {
@@ -371,6 +374,7 @@ void AFighterPawn::FireMissile() {
 	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
 	//AActor* target = Cast<AActor>(CurrentTarget);
 	missile->EngageTarget(CurrentTarget, this);
+	MissileRemain--;
 }
 
 void AFighterPawn::FireGuns() {
@@ -411,6 +415,11 @@ int AFighterPawn::GetBearing() const
 int AFighterPawn::GetHealth() const
 {
 	return FMath::FloorToInt(aircraftHP);
+}
+
+int AFighterPawn::GetMissile() const
+{
+	return FMath::FloorToInt(MissileRemain);
 }
 
 void AFighterPawn::SetSoundVolume(float volume)

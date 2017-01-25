@@ -24,6 +24,7 @@ AEnemyPawn::AEnemyPawn()
 	EnemyMesh->bAutoActivate = true;
 	EnemyMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	EnemyMesh->SetComponentTickEnabled(true);
+	EnemyMesh->SetNotifyRigidBodyCollision(true);
 	EnemyMesh->SetEnableGravity(false);
 
 	// set up enemy aircraft movment
@@ -45,7 +46,8 @@ void AEnemyPawn::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimit
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
 	FString message = "This is your enemy fighter pawn: " + GetName();
-	message += ". I have been hit!";
+	message += ". I have been hit by";
+	message += Other->GetName();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 }
 

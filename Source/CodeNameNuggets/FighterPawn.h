@@ -162,6 +162,9 @@ private:
 	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float DetectDistance;
 
+	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MissileRemain;
+
 	struct FCollisionShape DetectionShape;
 
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -194,6 +197,9 @@ public:
 
 	UFUNCTION(Category = UI, BlueprintPure)
 	int GetHealth() const;
+
+	UFUNCTION(Category = UI, BlueprintPure)
+	int GetMissile() const;
 
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundVolume(float volume);
