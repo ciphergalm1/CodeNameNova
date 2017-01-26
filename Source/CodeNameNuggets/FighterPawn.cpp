@@ -109,6 +109,7 @@ AFighterPawn::AFighterPawn()
 
 	/** setup cannon*/
 	isFiringCannon = false;
+	canFireCannon = true;
 
 	aircraftHP = 100.f;
 	MissileRemain = 152;
@@ -155,6 +156,8 @@ void AFighterPawn::Tick(float DeltaSeconds)
 	SpringArm->K2_SetRelativeRotation(newCameraRotator, false, hit, false);
 	*/
 
+	// config guns 
+	ShootGuns();
 
 	// config afterburnerEffect
 	ConfigAfterBurner();
@@ -396,14 +399,25 @@ void AFighterPawn::FireMissile() {
 
 void AFighterPawn::FireGuns() {
 	// define fire guns function
-	isFiringCannon = true;
-	ToggleCannonSound();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = Instigator;
-	FRotator SpawnRotation = GetActorRotation();
-	FVector SpawnLocation = PlaneMesh->GetSocketLocation("Cannon");
-	AGunShell* gunShell = GetWorld()->SpawnActor<AGunShell>(SpawnLocation, SpawnRotation, SpawnParams);
+	if (canFireCannon) {
+		isFiringCannon = true;
+		ToggleCannonSound();
+	}
+}
+
+void AFighterPawn::ShootGuns()
+{
+	if (isFiringCannon && canFireCannon) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		FRotator SpawnRotation = GetActorRotation();
+		FVector SpawnLocation = PlaneMesh->GetSocketLocation("Cannon");
+		AGunShell* gunShell = GetWorld()->SpawnActor<AGunShell>(SpawnLocation, SpawnRotation, SpawnParams);
+		canFireCannon = false;
+		GetWorld()->GetTimerManager().SetTimer(GunCoolHandle, this, &AFighterPawn::ResetGunCool, 0.2f);
+		canFireCannon = false;
+	}
 
 }
 
@@ -423,6 +437,11 @@ void AFighterPawn::ToggleCannonSound()
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Stop gun firing sound"));
 		CannonSoundComponent->Stop();
 	}
+}
+
+void AFighterPawn::ResetGunCool()
+{
+	canFireCannon = true;
 }
 
 float AFighterPawn::GetAirSpeed() const

@@ -3,6 +3,7 @@
 #include "CodeNameNuggets.h"
 #include "MissileCustom.h"
 #include "CustomExplosion_Aircraft.h"
+#include "EnemyPawn.h"
 
 
 // Sets default values
@@ -165,13 +166,17 @@ void AMissileCustom::SpawnExplosion()
 void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-	//check if the missile owner is not the target
 	if (currentTarget == Other) {
-		// do the explosion
+		// The missile hit its target
+
 		FString messageOwner = "Missile Owner: " + MissileOwner->GetName();
 		FString messagehit = " Hit Target: " + Other->GetName();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+
+		if (Other->GetClass()->IsChildOf(AEnemyPawn::StaticClass())) {
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Other actor is EnemyPawn type"));
+		}
 
 		SpawnExplosion();
 		SelfDestruction();
@@ -180,14 +185,15 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 		bHasHitTarget = true;
 	}
 	else if ( Other != MissileOwner ) {
+		// the missile hit some thing which is not supposed to hit
 		SpawnExplosion();
 		SelfDestruction();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Your missile hit something it is not supposed to hit!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Your missile hit something it is not supposed to hit!"));
 
 		bHasHitTarget = true;
 	}
 	else {
-		// handling error
+		// handling error: hit other missile or yourself
 
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Missile is not working correctly");
 		FString messageOwner = "Missile owner: " + MissileOwner->GetName();

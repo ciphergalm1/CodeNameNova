@@ -80,11 +80,15 @@ protected:
 	/** Bound to the Fire Guns button*/
 	void FireGuns();
 
+	void ShootGuns();
+
 	void StopFireGuns();
 
 	void ToggleCannonSound();
 
 	bool isFiringCannon;
+
+	bool canFireCannon;
 
 	bool bMissileOnLeftPylon;
 
@@ -178,6 +182,10 @@ private:
 
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class APawn* CurrentTarget;
+
+	FTimerHandle GunCoolHandle;
+
+	void ResetGunCool();
 
 public:
 
