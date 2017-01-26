@@ -22,7 +22,7 @@ AGunShell::AGunShell()
 	Shell->SetMobility(EComponentMobility::Movable);
 	Shell->SetNotifyRigidBodyCollision(true);
 
-	ConstructorHelpers::FObjectFinder<UParticleSystem> trailRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/ShellTrail.ShellTrail'"));
+	ConstructorHelpers::FObjectFinder<UParticleSystem> trailRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/P_BulletTrail.P_BulletTrail'"));
 	ShellTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Shell Trail"));
 	if (trailRef.Succeeded()) {
 		ShellTrail->SetTemplate(trailRef.Object);
@@ -78,6 +78,7 @@ void AGunShell::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other
 	FString message = "Shell hit " + Other->GetName();
 	SpawnExplosion();
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+	Shell->DestroyComponent();
 	Destroy();
 }
 
