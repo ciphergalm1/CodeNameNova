@@ -53,11 +53,9 @@ AFighterPawn::AFighterPawn()
 	Camera->bUsePawnControlRotation = false; // Don't rotate camera with controller
 
 	// Get Engine Sound Ref
-	static ConstructorHelpers::FObjectFinder<USoundCue> EngineSoundRef(TEXT("SoundCue'/Game/SFX/EngineSound/MiG-21_ENG.MiG-21_ENG'"));
+	ConstructorHelpers::FObjectFinder<USoundCue> EngineSoundRef(TEXT("SoundCue'/Game/SFX/EngineSound/MiG-21_ENG.MiG-21_ENG'"));
 
 	EngineSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSoundObj"));
-	EngineSoundComponent->SetupAttachment(RootComponent);
-	
 	// looping sound problem not solved........
 	// checking looping sound problem
 	if (EngineSoundRef.Succeeded()) {
@@ -68,6 +66,18 @@ AFighterPawn::AFighterPawn()
 		EngineSoundComponent->bAlwaysPlay = false;
 		EngineSoundComponent->Activate();
 	}
+
+	EngineSoundComponent->SetupAttachment(RootComponent);
+	
+
+	ConstructorHelpers::FObjectFinder<USoundCue> CannonSoundRef(TEXT("SoundCue'/Game/SFX/Cannon/GSh301_Cue.GSh301_Cue'"));
+	CannonSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("GunSoundObj"));
+	if (CannonSoundRef.Succeeded()) {
+		CannonSoundComponent->SetSound(CannonSoundRef.Object);
+		CannonSoundComponent->bAutoActivate = false;
+		CannonSoundComponent->SetupAttachment(RootComponent);
+	}
+	
 
 	// setting up the afterburner component
 	ConstructorHelpers::FObjectFinder<UParticleSystem> afterBurnerRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/P_AfterBurner.P_AfterBurner'"));
@@ -96,6 +106,9 @@ AFighterPawn::AFighterPawn()
 	DetectionShape = FCollisionShape::MakeCapsule(5000.f, 30000.f);
 	//DetectionShape.SetCapsule(3000.f,30000.f);
 	CurrentTarget = nullptr;
+
+	/** setup cannon*/
+	isFiringCannon = false;
 
 	aircraftHP = 100.f;
 	MissileRemain = 152;
@@ -194,7 +207,10 @@ void AFighterPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("CameraUp", this, &AFighterPawn::CameraUpInput);
 	PlayerInputComponent->BindAxis("CameraRight", this, &AFighterPawn::CameraRightInput);
 	PlayerInputComponent->BindAction("FireMissile", IE_Pressed, this, &AFighterPawn::FireMissile);
+
 	PlayerInputComponent->BindAction("FireGuns", IE_Pressed, this, &AFighterPawn::FireGuns);
+	PlayerInputComponent->BindAction("FireGuns", IE_Released, this, &AFighterPawn::StopFireGuns);
+
 	PlayerInputComponent->BindAction("SearchTarget", IE_Pressed, this, &AFighterPawn::SearchTarget);
 }
 
@@ -380,7 +396,8 @@ void AFighterPawn::FireMissile() {
 
 void AFighterPawn::FireGuns() {
 	// define fire guns function
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have pushed the gun button"));
+	isFiringCannon = true;
+	ToggleCannonSound();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = Instigator;
@@ -388,6 +405,24 @@ void AFighterPawn::FireGuns() {
 	FVector SpawnLocation = PlaneMesh->GetSocketLocation("Cannon");
 	AGunShell* gunShell = GetWorld()->SpawnActor<AGunShell>(SpawnLocation, SpawnRotation, SpawnParams);
 
+}
+
+void AFighterPawn::StopFireGuns()
+{
+	isFiringCannon = false;
+	ToggleCannonSound();
+}
+
+void AFighterPawn::ToggleCannonSound()
+{
+	if (isFiringCannon) {
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Start gun firing sound"));
+		CannonSoundComponent->Play();
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Stop gun firing sound"));
+		CannonSoundComponent->Stop();
+	}
 }
 
 float AFighterPawn::GetAirSpeed() const

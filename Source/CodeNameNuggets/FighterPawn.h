@@ -25,6 +25,9 @@ class CODENAMENUGGETS_API AFighterPawn : public APawn
 	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* EngineSoundComponent;
 
+	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* CannonSoundComponent;
+
 	UPROPERTY(Category = VFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* AfterBurnerComponent;
 
@@ -76,6 +79,12 @@ protected:
 
 	/** Bound to the Fire Guns button*/
 	void FireGuns();
+
+	void StopFireGuns();
+
+	void ToggleCannonSound();
+
+	bool isFiringCannon;
 
 	bool bMissileOnLeftPylon;
 
