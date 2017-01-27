@@ -38,6 +38,13 @@ public:
 
 	bool IsAlive();
 
+	int LockOnStatus; // 0 for idle , 1 for selected , 2 for locked on
+
+	void SetLockOnStatus(int val);
+
+	UFUNCTION(Category = LockOnStatus, BlueprintCallable)
+	int GetLockOnStatus();
+
 private:
 
 	FRotator enemyAttitude;

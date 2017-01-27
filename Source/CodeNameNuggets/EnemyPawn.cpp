@@ -31,6 +31,9 @@ AEnemyPawn::AEnemyPawn()
 	// set up enemy aircraft movment
 	CurrentAirSpeed = 6000.f;
 
+	// set up lock on status
+	LockOnStatus = 0;
+
 	currentAttackTimer = 0.f;
 	Health = 100.f;
 	AttackInterval = 15.f;
@@ -106,6 +109,18 @@ bool AEnemyPawn::IsAlive()
 		result = false;
 	}
 	return result;
+}
+
+void AEnemyPawn::SetLockOnStatus(int val)
+{
+	LockOnStatus = FMath::Clamp(val, 0, 2);
+	FString message = "Lock on status: " + LockOnStatus;
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+}
+
+int AEnemyPawn::GetLockOnStatus()
+{
+	return LockOnStatus;
 }
 
 void AEnemyPawn::FlyInCircle()

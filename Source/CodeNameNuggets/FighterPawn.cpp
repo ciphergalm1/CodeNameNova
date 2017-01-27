@@ -5,6 +5,7 @@
 #include "CustomExplosion_Aircraft.h"
 #include "MissileCustom.h"
 #include "GunShell.h"
+#include "EnemyPawn.h"
 
 AFighterPawn::AFighterPawn()
 {
@@ -321,6 +322,7 @@ void AFighterPawn::SearchTarget()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("----------------------------------------------------"));
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Start target searching!"));
 	FCollisionResponseParams ResponseParams;
+	AEnemyPawn* targetSelected = nullptr;
 
 	/* Trying debug capsule */
 	//FVector center = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectDistance;
@@ -336,18 +338,19 @@ void AFighterPawn::SearchTarget()
 				if ((*it).GetActor() != this) {
 					FVector targetLocation = (*it).Actor->GetActorLocation();
 					FString targetName = "Find target: " + (*it).Component->GetName();
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, targetName);
 					DrawDebugSphere(GetWorld(), targetLocation, 500.f, 16, FColor::Green, false, 10.f);
 					if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
 						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
 						FString message = "Target Accquired: " + (*it).Actor->GetName();
 						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 						AActor* target = (*it).GetActor();
-						CurrentTarget = Cast<APawn>(target);
-
+						CurrentTarget = Cast<AEnemyPawn>(target);
+						
 					}
 				}
 			}
+			targetSelected = Cast<AEnemyPawn>(CurrentTarget);
+			targetSelected->SetLockOnStatus(1);
 		}
 
 	}
@@ -372,6 +375,8 @@ void AFighterPawn::SearchTarget()
 					}
 				}
 			}
+			targetSelected = Cast<AEnemyPawn>(CurrentTarget);
+			targetSelected->SetLockOnStatus(1);
 		}
 		/** replication over */
 
