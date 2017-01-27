@@ -114,8 +114,6 @@ bool AEnemyPawn::IsAlive()
 void AEnemyPawn::SetLockOnStatus(int val)
 {
 	LockOnStatus = FMath::Clamp(val, 0, 2);
-	FString message = "Lock on status: " + LockOnStatus;
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 }
 
 int AEnemyPawn::GetLockOnStatus()

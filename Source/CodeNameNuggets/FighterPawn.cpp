@@ -493,7 +493,7 @@ void AFighterPawn::LockOnTarget()
 		//FVector::DotProduct(GetActorForwardVector(), targetVector);
 		Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(PlaneMesh->GetForwardVector(), targetVector)));
 		if (Angle <= 70) {
-			LockOnGauge += (70.f*GetWorld()->GetDeltaSeconds());
+			LockOnGauge += (45.f*GetWorld()->GetDeltaSeconds());
 		}
 		else {
 			LockOnGauge -= (60.f*GetWorld()->GetDeltaSeconds());
@@ -519,14 +519,13 @@ void AFighterPawn::LockOnTarget()
 			CurrentTarget = nullptr;
 			targetSelected->SetLockOnStatus(1);
 		}
-
 	}
 	else {
 		LockedSoundComponent->Stop();
 		LockingSoundComponent->Stop();
 	}
-	FString message = "Lock on gauge: " + FString::SanitizeFloat(LockOnGauge);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, message);
+	//FString message = "Lock on gauge: " + FString::SanitizeFloat(LockOnGauge);
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, message);
 }
 
 void AFighterPawn::ResetGunCool()

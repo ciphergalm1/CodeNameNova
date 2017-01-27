@@ -43,14 +43,16 @@ void ACustomExplosion_Aircraft::BeginPlay()
 	Super::BeginPlay();
 	ExplosionEffectComponent->ActivateSystem();
 	ExplosionSoundComponent->Play();
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Begin play method"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Begin play method"));
 	//ExplosionSoundComponent->Activate();
 	
+	/*
 	if (explosionCue) {
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), explosionCue, GetActorLocation(), .8f, 1.0f);
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Play sound method"));
 		fLifeTime = 0.0f;
 	}
+	*/
 }
 
 // Called every frame

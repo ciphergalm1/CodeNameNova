@@ -45,7 +45,7 @@ void AGunShell::BeginPlay()
 	Super::BeginPlay();
 	ShellTrail->ActivateSystem();
 	FVector endPos = GetActorLocation() + 50000.f * GetActorForwardVector();
-	DrawDebugLine(GetWorld(), GetActorLocation(), endPos, FColor::Blue, false, 3.f);
+	//DrawDebugLine(GetWorld(), GetActorLocation(), endPos, FColor::Blue, false, 3.f);
 }
 
 // Called every frame
