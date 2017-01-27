@@ -29,9 +29,13 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	void SetDamage(float val);
+
 private:
 
 	float ShellSpeed;
+
+	float damage;
 
 	// handle shell movement
 	void shellTravel();

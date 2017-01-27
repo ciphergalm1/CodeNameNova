@@ -3,6 +3,7 @@
 #include "CodeNameNuggets.h"
 #include "GunShell.h"
 #include "CustomExplosion_Aircraft.h"
+#include "EnemyPawn.h"
 
 
 // Sets default values
@@ -31,7 +32,11 @@ AGunShell::AGunShell()
 	ShellTrail->SetWorldScale3D(trailScale);
 	ShellTrail->SetupAttachment(RootComponent);
 
+	// set up shell speed 
 	ShellSpeed = 48000.f;
+
+	// set up shell damage
+	damage = 30.f;
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +53,11 @@ void AGunShell::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 	shellTravel();
+}
+
+void AGunShell::SetDamage(float val)
+{
+	damage = val;
 }
 
 void AGunShell::shellTravel()
@@ -74,11 +84,12 @@ void AGunShell::SpawnExplosion()
 void AGunShell::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
-
-	FString message = "Shell hit " + Other->GetName();
 	
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
-
+	if (Other->GetClass()->IsChildOf(AEnemyPawn::StaticClass())) {
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Other actor is EnemyPawn type"));
+		AEnemyPawn* tempTarget = Cast<AEnemyPawn>(Other);
+		tempTarget->ReceiveDamage(damage);
+	}
 
 	SpawnExplosion();
 	Shell->DestroyComponent();

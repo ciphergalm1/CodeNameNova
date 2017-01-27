@@ -44,7 +44,7 @@ void ACustomExplosion_Aircraft::BeginPlay()
 {
 	Super::BeginPlay();
 	ExplosionEffectComponent->ActivateSystem();
-	ExplosionSoundComponent->Activate();
+	//ExplosionSoundComponent->Activate();
 	ExplosionSoundComponent->Play();
 	if (explosionCue) {
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), explosionCue, GetActorLocation(), .8f, 1.0f);
