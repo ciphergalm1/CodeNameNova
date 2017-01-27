@@ -78,9 +78,27 @@ AFighterPawn::AFighterPawn()
 		CannonSoundComponent->bAutoActivate = false;
 		CannonSoundComponent->SetupAttachment(RootComponent);
 	}
-	
 
-	// setting up the afterburner component
+	// set up the locking sound
+	ConstructorHelpers::FObjectFinder<USoundCue> LockingSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/BeaconFar_Cue.BeaconFar_Cue'"));
+	LockingSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LockingSoundObject"));
+	if (LockingSoundRef.Succeeded()) {
+		LockingSoundComponent->SetSound(LockingSoundRef.Object);
+		LockingSoundComponent->bAutoActivate = false;
+		LockingSoundComponent->SetupAttachment(RootComponent);
+	}
+
+	// set up the locked sound 
+	ConstructorHelpers::FObjectFinder<USoundCue> LockedSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/LockWarning_Cue.LockWarning_Cue'"));
+	LockedSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LockedSoundObject"));
+	if (LockedSoundRef.Succeeded()) {
+		LockedSoundComponent->SetSound(LockedSoundRef.Object);
+		LockedSoundComponent->bAutoActivate = false;
+		LockedSoundComponent->SetupAttachment(RootComponent);
+	}
+
+
+	// set up the afterburner component
 	ConstructorHelpers::FObjectFinder<UParticleSystem> afterBurnerRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/P_AfterBurner.P_AfterBurner'"));
 	AfterBurnerComponent = CreateDefaultSubobject<UParticleSystemComponent>("Afterburner component");
 	if (afterBurnerRef.Succeeded()) {
@@ -106,7 +124,11 @@ AFighterPawn::AFighterPawn()
 	DetectionShape = FCollisionShape();
 	DetectionShape = FCollisionShape::MakeCapsule(5000.f, 30000.f);
 	//DetectionShape.SetCapsule(3000.f,30000.f);
+
+	/** set up target selection  */
+	LockOnGauge = 0;
 	CurrentTarget = nullptr;
+	targetSelected = nullptr;
 
 	/** set up the missile damage system*/
 	MissileDamage = 65.f;
@@ -162,6 +184,9 @@ void AFighterPawn::Tick(float DeltaSeconds)
 
 	// config guns 
 	ShootGuns();
+
+	// config target lock on
+	LockOnTarget();
 
 	// config afterburnerEffect
 	ConfigAfterBurner();
@@ -304,13 +329,11 @@ void AFighterPawn::CameraUpInput(float Val)
 	// setting new rotation to the spring arm
 	// SpringArm
 	CurrentCameraPitch = FMath::FInterpTo(CurrentCameraPitch, 180 * Val, GetWorld()->GetDeltaSeconds(), 2.f);
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("up and down"));
 }
 
 void AFighterPawn::CameraRightInput(float Val)
 {
 	CurrentCameraYaw = FMath::FInterpTo(CurrentCameraYaw, 180 * Val, GetWorld()->GetDeltaSeconds(), 2.f);
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("right and left"));
 }
 
 void AFighterPawn::SearchTarget()
@@ -322,15 +345,13 @@ void AFighterPawn::SearchTarget()
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("----------------------------------------------------"));
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Start target searching!"));
 	FCollisionResponseParams ResponseParams;
-	AEnemyPawn* targetSelected = nullptr;
+	ClearSelectTarget();
 
 	/* Trying debug capsule */
 	//FVector center = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectDistance;
 	//DrawDebugCapsule(GetWorld(), center, 30000.f, 3000.f, PlaneMesh->GetComponentRotation().Quaternion(), FColor::Green, false, 10.f);
 
-	if (CurrentTarget==nullptr) {
-		
-		//bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos,  GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
+	if (targetSelected == nullptr) {
 		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos, GetActorForwardVector().ToOrientationQuat(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
 		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
 		if (bHasDetecTarget) {
@@ -344,18 +365,21 @@ void AFighterPawn::SearchTarget()
 						FString message = "Target Accquired: " + (*it).Actor->GetName();
 						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 						AActor* target = (*it).GetActor();
-						CurrentTarget = Cast<AEnemyPawn>(target);
+						targetSelected = Cast<AEnemyPawn>(target);
 						
 					}
 				}
 			}
-			targetSelected = Cast<AEnemyPawn>(CurrentTarget);
-			targetSelected->SetLockOnStatus(1);
+			if (targetSelected) {
+				//targetSelected = Cast<AEnemyPawn>(CurrentTarget);
+				targetSelected->SetLockOnStatus(1);
+			}
 		}
 
 	}
+	/*
 	else {
-		/**  replication of search target */
+		//  replication of search target
 		CurrentTarget = nullptr;
 		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos, GetActorRotation().Quaternion(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
 		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
@@ -375,12 +399,12 @@ void AFighterPawn::SearchTarget()
 					}
 				}
 			}
-			targetSelected = Cast<AEnemyPawn>(CurrentTarget);
-			targetSelected->SetLockOnStatus(1);
+			if (CurrentTarget) {
+				targetSelected = Cast<AEnemyPawn>(CurrentTarget);
+				targetSelected->SetLockOnStatus(1);
+			}
 		}
 		/** replication over */
-
-	}
 
 }
 
@@ -449,6 +473,60 @@ void AFighterPawn::ToggleCannonSound()
 		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Stop gun firing sound"));
 		CannonSoundComponent->Stop();
 	}
+}
+
+void AFighterPawn::ClearSelectTarget()
+{
+	if (targetSelected) {
+		targetSelected->SetLockOnStatus(0);
+		LockOnGauge = 0;
+		targetSelected = nullptr;
+	}
+}
+
+void AFighterPawn::LockOnTarget()
+{
+	float Angle = 0.f;
+	if (targetSelected) {
+		FVector targetLocation = targetSelected->GetActorLocation();
+		FVector targetVector = targetLocation - GetActorLocation();
+		//FVector::DotProduct(GetActorForwardVector(), targetVector);
+		Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(PlaneMesh->GetForwardVector(), targetVector)));
+		if (Angle <= 70) {
+			LockOnGauge += (70.f*GetWorld()->GetDeltaSeconds());
+		}
+		else {
+			LockOnGauge -= (60.f*GetWorld()->GetDeltaSeconds());
+		}
+		LockOnGauge = FMath::Clamp(LockOnGauge, 0.0f, 150.f);
+
+		if (LockOnGauge >= 100 && Angle <= 70) {
+			// play locked sound
+			LockedSoundComponent->Play();
+			LockingSoundComponent->Stop();
+			// lock on target
+			CurrentTarget = targetSelected;
+			targetSelected->SetLockOnStatus(2);
+		}
+		else if (Angle <= 70) {
+			// play locking sound
+			LockedSoundComponent->Stop();
+			LockingSoundComponent->Play();
+			CurrentTarget = nullptr;
+			targetSelected->SetLockOnStatus(1);
+		}
+		else {
+			CurrentTarget = nullptr;
+			targetSelected->SetLockOnStatus(1);
+		}
+
+	}
+	else {
+		LockedSoundComponent->Stop();
+		LockingSoundComponent->Stop();
+	}
+	FString message = "Lock on gauge: " + FString::SanitizeFloat(LockOnGauge);
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, message);
 }
 
 void AFighterPawn::ResetGunCool()
@@ -545,6 +623,7 @@ void AFighterPawn::ConfigEngineSound()
 
 void AFighterPawn::ConfigEngineViberation()
 {
+	// to be implemented
 }
 
 void AFighterPawn::ConfigAfterBurner()

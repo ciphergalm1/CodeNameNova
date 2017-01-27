@@ -28,6 +28,12 @@ class CODENAMENUGGETS_API AFighterPawn : public APawn
 	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* CannonSoundComponent;
 
+	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* LockingSoundComponent;
+
+	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* LockedSoundComponent;
+
 	UPROPERTY(Category = VFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* AfterBurnerComponent;
 
@@ -186,7 +192,16 @@ private:
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class APawn* CurrentTarget;
 
+	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class AEnemyPawn* targetSelected;
+
+	void ClearSelectTarget();
+
 	FTimerHandle GunCoolHandle;
+
+	float LockOnGauge;
+
+	void LockOnTarget();
 
 	void ResetGunCool();
 

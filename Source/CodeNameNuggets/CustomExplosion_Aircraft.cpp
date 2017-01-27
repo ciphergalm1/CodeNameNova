@@ -28,12 +28,9 @@ ACustomExplosion_Aircraft::ACustomExplosion_Aircraft()
 	ExplosionSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("ExplosionSound"));
 	if (soundRef.Succeeded()) {
 		ExplosionSoundComponent->SetSound(soundRef.Object);
-		explosionCue = soundRef.Object;
+		//explosionCue = soundRef.Object;
 	}
 	ExplosionSoundComponent->SetupAttachment(RootComponent);
-	ExplosionSoundComponent->bAutoActivate = true;
-	ExplosionSoundComponent->Play();
-	ExplosionSoundComponent->bAutoDestroy = true;
 	
 
 	fMaxLifeTime = 4.0f;
@@ -45,10 +42,13 @@ void ACustomExplosion_Aircraft::BeginPlay()
 {
 	Super::BeginPlay();
 	ExplosionEffectComponent->ActivateSystem();
+	ExplosionSoundComponent->Play();
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Begin play method"));
 	//ExplosionSoundComponent->Activate();
 	
 	if (explosionCue) {
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), explosionCue, GetActorLocation(), .8f, 1.0f);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Play sound method"));
 		fLifeTime = 0.0f;
 	}
 }
