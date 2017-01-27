@@ -178,6 +178,9 @@ private:
 	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float MissileRemain;
 
+	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float MissileDamage;
+
 	struct FCollisionShape DetectionShape;
 
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

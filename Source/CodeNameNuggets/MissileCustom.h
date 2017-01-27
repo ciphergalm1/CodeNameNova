@@ -40,6 +40,8 @@ public:
 
 	APawn* MissileOwner;
 
+	void SetDamage(float val);
+
 private:
 
 	// Manage target hit flag
@@ -72,6 +74,8 @@ private:
 	void SelfDestruction();
 
 	void SpawnExplosion();
+
+	float damage;
 
 
 	

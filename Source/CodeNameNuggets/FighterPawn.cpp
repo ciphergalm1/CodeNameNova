@@ -107,6 +107,9 @@ AFighterPawn::AFighterPawn()
 	//DetectionShape.SetCapsule(3000.f,30000.f);
 	CurrentTarget = nullptr;
 
+	/** set up the missile damage system*/
+	MissileDamage = 65.f;
+
 	/** setup cannon*/
 	isFiringCannon = false;
 	canFireCannon = true;
@@ -395,6 +398,7 @@ void AFighterPawn::FireMissile() {
 		AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
 		// old guidance system
 		// AActor* target = Cast<AActor>(CurrentTarget);
+		missile->SetDamage(MissileDamage);
 		missile->EngageTarget(CurrentTarget, this);
 		MissileRemain--;
 	}

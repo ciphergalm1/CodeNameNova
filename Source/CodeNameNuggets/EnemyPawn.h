@@ -34,7 +34,9 @@ public:
 
 	void ReceiveDamage(float val);
 
-	bool VerifyHealth();
+	void SelfDestruction();
+
+	bool IsAlive();
 
 private:
 

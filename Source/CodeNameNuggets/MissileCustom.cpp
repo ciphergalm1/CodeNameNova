@@ -43,12 +43,15 @@ AMissileCustom::AMissileCustom()
 	MissileSoundComponent->Play();
 
 
-	//SetActorEnableCollision(true);
+	// SetActorEnableCollision(true);
 	// set up the missile
 	currentAirSpeed = 8000.f;
 	bHasHitTarget = false;
 	bHasBeenFired = false;
 	bHasTarget = false;
+
+	// set up missile damage
+	damage = 35.f;
 
 	SelfDestructionTimer = 3.0f;
 	
@@ -107,6 +110,11 @@ void AMissileCustom::EngageTarget(AActor * target, APawn* newMissileOwner)
 	MissileOwner = newMissileOwner;
 	//fire the missile
 	Fire();
+}
+
+void AMissileCustom::SetDamage(float val)
+{
+	damage = val;
 }
 
 void AMissileCustom::Boosting()
@@ -175,7 +183,9 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 
 		if (Other->GetClass()->IsChildOf(AEnemyPawn::StaticClass())) {
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Other actor is EnemyPawn type"));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Other actor is EnemyPawn type"));
+			AEnemyPawn* tempTarget = Cast<AEnemyPawn>(Other);
+			tempTarget->ReceiveDamage(damage);
 		}
 
 		SpawnExplosion();

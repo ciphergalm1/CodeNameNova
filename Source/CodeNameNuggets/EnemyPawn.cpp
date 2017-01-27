@@ -3,6 +3,7 @@
 #include "CodeNameNuggets.h"
 #include "EnemyPawn.h"
 #include "MissileCustom.h"
+#include "CustomExplosion_Aircraft.h"
 
 // Sets default values
 AEnemyPawn::AEnemyPawn()
@@ -31,6 +32,7 @@ AEnemyPawn::AEnemyPawn()
 	CurrentAirSpeed = 6000.f;
 
 	currentAttackTimer = 0.f;
+	Health = 100.f;
 	AttackInterval = 15.f;
 }
 
@@ -55,10 +57,17 @@ void AEnemyPawn::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimit
 void AEnemyPawn::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	// manage attack timer;
-	currentAttackTimer += GetWorld()->GetDeltaSeconds();
-	FlyInCircle();
-	//FireControl();
+	if (IsAlive()) {
+		// pawn is alive , continue the attack
+		// manage attack timer;
+		currentAttackTimer += GetWorld()->GetDeltaSeconds();
+		FlyInCircle();
+		//FireControl();
+	}
+	else {
+		// pawn is dead
+		SelfDestruction();
+	}
 }
 
 // Called to bind functionality to input
@@ -70,11 +79,33 @@ void AEnemyPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 void AEnemyPawn::ReceiveDamage(float val)
 {
+	Health -= val;
 }
 
-bool AEnemyPawn::VerifyHealth()
+void AEnemyPawn::SelfDestruction()
 {
-	return false;
+	// spawn explosion 
+	UWorld* const world = GetWorld();
+	if (world) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+		world->SpawnActor<ACustomExplosion_Aircraft>(SpawnLocation, SpawnRotation, SpawnParams);
+	}
+	// destroy the enemy
+	EnemyMesh->DestroyComponent();
+	Destroy();
+}
+
+bool AEnemyPawn::IsAlive()
+{
+	bool result = true;
+	if (Health <= 0) {
+		result = false;
+	}
+	return result;
 }
 
 void AEnemyPawn::FlyInCircle()
@@ -96,7 +127,6 @@ void AEnemyPawn::FireControl()
 
 void AEnemyPawn::AttackTarget(AActor * Target)
 {
-
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have fire at you!"));
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
