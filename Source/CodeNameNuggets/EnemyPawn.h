@@ -32,6 +32,10 @@ public:
 	UPROPERTY(Category = target, BlueprintReadOnly)
 	class AActor* currentTarget;
 
+	void ReceiveDamage(float val);
+
+	bool VerifyHealth();
+
 private:
 
 	FRotator enemyAttitude;
@@ -51,5 +55,7 @@ private:
 	float currentAttackTimer;
 
 	float AttackInterval;
+
+	float Health;
 	
 };

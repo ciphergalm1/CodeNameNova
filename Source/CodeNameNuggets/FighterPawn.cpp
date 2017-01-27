@@ -378,23 +378,26 @@ void AFighterPawn::SearchTarget()
 
 void AFighterPawn::FireMissile() {
 	// define fire missile function
-	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player have fired!"));
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = Instigator;
-	FRotator SpawnRotation = GetActorRotation();
-	FVector SpawnLocation;
-	if (bMissileOnLeftPylon) {
-		SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_L"));
+	
+	if (MissileRemain > 0) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		FRotator SpawnRotation = GetActorRotation();
+		FVector SpawnLocation;
+		if (bMissileOnLeftPylon) {
+			SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_L"));
+		}
+		else {
+			SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_R"));
+		}
+		bMissileOnLeftPylon = !bMissileOnLeftPylon;
+		AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
+		// old guidance system
+		// AActor* target = Cast<AActor>(CurrentTarget);
+		missile->EngageTarget(CurrentTarget, this);
+		MissileRemain--;
 	}
-	else {
-		SpawnLocation = PlaneMesh->GetSocketLocation(FName("Pylon_R"));
-	}
-	bMissileOnLeftPylon = !bMissileOnLeftPylon;
-	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
-	//AActor* target = Cast<AActor>(CurrentTarget);
-	missile->EngageTarget(CurrentTarget, this);
-	MissileRemain--;
 }
 
 void AFighterPawn::FireGuns() {

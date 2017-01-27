@@ -76,8 +76,11 @@ void AGunShell::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
 	FString message = "Shell hit " + Other->GetName();
-	SpawnExplosion();
+	
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+
+
+	SpawnExplosion();
 	Shell->DestroyComponent();
 	Destroy();
 }

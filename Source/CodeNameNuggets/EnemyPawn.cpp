@@ -68,6 +68,15 @@ void AEnemyPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 }
 
+void AEnemyPawn::ReceiveDamage(float val)
+{
+}
+
+bool AEnemyPawn::VerifyHealth()
+{
+	return false;
+}
+
 void AEnemyPawn::FlyInCircle()
 {
 	FVector movingOffset = FVector(CurrentAirSpeed, 0.f, 0.f);
