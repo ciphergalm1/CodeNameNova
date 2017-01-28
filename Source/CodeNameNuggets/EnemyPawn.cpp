@@ -41,6 +41,9 @@ AEnemyPawn::AEnemyPawn()
 	AttackInterval = 15.f;
 	alertStatus = 0;
 	turnRate = 90.0f;
+
+	HateShape = FCollisionShape();
+	HateShape = FCollisionShape::MakeSphere(20000.f);
 }
 
 // Called when the game starts or when spawned
@@ -97,6 +100,7 @@ void AEnemyPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent
 void AEnemyPawn::ReceiveDamage(float val)
 {
 	alertStatus = 1;
+	SpreadHate();
 	Health -= val;
 }
 
@@ -138,6 +142,35 @@ void AEnemyPawn::SetLockOnStatus(int val)
 int AEnemyPawn::GetLockOnStatus()
 {
 	return LockOnStatus;
+}
+
+void AEnemyPawn::SpreadHate()
+{
+	// notify other enemy
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams CollisionParams;
+	FCollisionResponseParams ResponseParams;
+	FVector StartPos = GetActorLocation();
+	FVector EndPos = GetActorLocation() + (EnemyMesh->GetForwardVector())*20000.f;
+
+	bool bHasNotify = GetWorld()->SweepMultiByChannel( HitResults, StartPos, EndPos, GetActorForwardVector().ToOrientationQuat(), ECollisionChannel::ECC_Pawn, HateShape, CollisionParams, ResponseParams);
+	if (bHasNotify) {
+		for (auto it = HitResults.CreateIterator(); it; it++) {
+			if ((*it).GetActor() != this) {
+				//DrawDebugSphere(GetWorld(), targetLocation, 500.f, 16, FColor::Green, false, 10.f);
+				if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
+					AActor* target = (*it).GetActor();
+					AEnemyPawn* notifyTarget = Cast<AEnemyPawn>(target);
+					notifyTarget->SetAlertStatus(1);
+				}
+			}
+		}
+	}
+}
+
+void AEnemyPawn::SetAlertStatus(int val)
+{
+	alertStatus = val;
 }
 
 void AEnemyPawn::FlyInCircle()

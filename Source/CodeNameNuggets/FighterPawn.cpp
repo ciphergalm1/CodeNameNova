@@ -211,6 +211,8 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 		//EngineSoundComponent->SetPaused(true);
 		//EngineSoundComponent->PlaybackCompleted(EngineSoundComponent->GetAudioComponentID(),false);
 		EngineSoundComponent->FadeOut(.5f, .0f);
+		LockedSoundComponent->Stop();
+		LockingSoundComponent->Stop();
 		EngineSoundComponent->Stop();
 		EngineSoundComponent->Deactivate();
 		//EngineSoundComponent->DestroyComponent();
@@ -340,8 +342,8 @@ void AFighterPawn::SearchTarget()
 	FVector StartPos = PlaneMesh->GetSocketLocation(FName("Nose"));
 	FVector EndPos = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectDistance;
 	FCollisionQueryParams CollisionParams;
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("----------------------------------------------------"));
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Start target searching!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("----------------------------------------------------"));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Start target searching!"));
 	FCollisionResponseParams ResponseParams;
 	ClearSelectTarget();
 

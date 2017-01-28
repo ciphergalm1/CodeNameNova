@@ -45,8 +45,17 @@ public:
 	UFUNCTION(Category = LockOnStatus, BlueprintCallable)
 	int GetLockOnStatus();
 
+	UFUNCTION(Category = LockOnStatus, BlueprintCallable)
+	void SpreadHate();
+
+	// set up hate sphere
+	struct FCollisionShape HateShape;
+
 	UPROPERTY(Category = target, BlueprintReadOnly)
 	int alertStatus;
+
+	UFUNCTION(Category = LockOnStatus, BlueprintCallable)
+	void SetAlertStatus(int val);
 
 private:
 
