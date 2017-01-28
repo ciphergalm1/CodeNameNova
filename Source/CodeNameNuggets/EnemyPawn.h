@@ -45,6 +45,9 @@ public:
 	UFUNCTION(Category = LockOnStatus, BlueprintCallable)
 	int GetLockOnStatus();
 
+	UPROPERTY(Category = target, BlueprintReadOnly)
+	int alertStatus;
+
 private:
 
 	FRotator enemyAttitude;
@@ -56,6 +59,8 @@ private:
 	void FlyStraight();
 
 	void FireControl();
+
+	void TrackingPlayer();
 
 	void AttackTarget(AActor* Target);
 
@@ -70,5 +75,7 @@ private:
 	float Health;
 
 	float point;
+
+	float turnRate;
 	
 };

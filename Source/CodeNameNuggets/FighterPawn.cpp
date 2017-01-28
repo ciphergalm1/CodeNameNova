@@ -351,13 +351,13 @@ void AFighterPawn::SearchTarget()
 
 	if (targetSelected == nullptr) {
 		bool bHasDetecTarget = GetWorld()->SweepMultiByChannel(HitResults, StartPos, EndPos, GetActorForwardVector().ToOrientationQuat(), ECollisionChannel::ECC_Pawn, DetectionShape, CollisionParams, ResponseParams);
-		DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
+		//DrawDebugLine(GetWorld(), StartPos, EndPos, FColor::Green, false, 10.f);
 		if (bHasDetecTarget) {
 			for (auto it = HitResults.CreateIterator(); it; it++) {
 				if ((*it).GetActor() != this) {
 					FVector targetLocation = (*it).Actor->GetActorLocation();
 					FString targetName = "Find target: " + (*it).Component->GetName();
-					DrawDebugSphere(GetWorld(), targetLocation, 500.f, 16, FColor::Green, false, 10.f);
+					//DrawDebugSphere(GetWorld(), targetLocation, 500.f, 16, FColor::Green, false, 10.f);
 					if ((*it).Actor->GetRootComponent()->ComponentHasTag(FName("EnemyAircraft"))) {
 						GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Target Accquired!"));
 						FString message = "Target Accquired: " + (*it).Actor->GetName();

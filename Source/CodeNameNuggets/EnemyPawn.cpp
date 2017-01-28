@@ -39,6 +39,8 @@ AEnemyPawn::AEnemyPawn()
 	Health = 100.f;
 	point = 1000000.f;
 	AttackInterval = 15.f;
+	alertStatus = 0;
+	turnRate = 90.0f;
 }
 
 // Called when the game starts or when spawned
@@ -52,10 +54,10 @@ void AEnemyPawn::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimit
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	FString message = "This is your enemy fighter pawn: " + GetName();
-	message += ". I have been hit by";
-	message += Other->GetName();
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+	//FString message = "This is your enemy fighter pawn: " + GetName();
+	//message += ". I have been hit by";
+	//message += Other->GetName();
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
 }
 
 // Called every frame
@@ -66,7 +68,17 @@ void AEnemyPawn::Tick( float DeltaTime )
 		// pawn is alive , continue the attack
 		// manage attack timer;
 		currentAttackTimer += GetWorld()->GetDeltaSeconds();
-		FlyStraight();
+		if (alertStatus == 0) {
+			// Normal Patrol
+			FlyStraight();
+		}
+		else if( alertStatus == 1) 
+		{
+			// Engage Player code here
+			FlyStraight();
+			TrackingPlayer();
+			FireControl();
+		}
 		//FireControl();
 	}
 	else {
@@ -84,6 +96,7 @@ void AEnemyPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 void AEnemyPawn::ReceiveDamage(float val)
 {
+	alertStatus = 1;
 	Health -= val;
 }
 
@@ -150,6 +163,21 @@ void AEnemyPawn::FireControl()
 	}
 }
 
+void AEnemyPawn::TrackingPlayer()
+{
+	// keep the player in sight;
+	FVector currentLocation = GetActorLocation();
+	FVector targetLocation = currentTarget->GetActorLocation();
+	FVector targetVector = targetLocation - currentLocation;
+	float distance = targetVector.Size();
+
+	if (distance> 8000.f) {
+		FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
+		SetActorRotation(NewVector.Rotation());
+	}
+	
+}
+
 void AEnemyPawn::AttackTarget(AActor * Target)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have fire at you!"));
@@ -164,8 +192,16 @@ void AEnemyPawn::AttackTarget(AActor * Target)
 
 bool AEnemyPawn::CanAttack()
 {
+	// the condition to attack is here
 	bool result = false;
-	result = (currentAttackTimer > AttackInterval) ? true : false;
+	// target within angle
+	FVector currentLocation = GetActorLocation();
+	FVector targetLocation = currentTarget->GetActorLocation();
+	FVector targetVector = targetLocation - currentLocation;
+	float distance = targetVector.Size();
+	if (distance<=10000.f) {
+		result = (currentAttackTimer > AttackInterval) ? true : false;
+	}
 	return result;
 }
 
