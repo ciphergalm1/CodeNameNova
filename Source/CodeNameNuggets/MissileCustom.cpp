@@ -133,13 +133,22 @@ void AMissileCustom::SetTarget(AActor * target)
 
 void AMissileCustom::Homing(AActor * target)
 {
-	if (bHasTarget) {
+	// add cone detection
+	if (target) {
 		FVector currentLocation = GetActorLocation();
 		FVector targetLocation = target->GetActorLocation();
 		FVector targetVector = targetLocation - currentLocation;
-		FVector NewVector = FMath::VInterpNormalRotationTo(GetActorForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
-		SetActorRotation(NewVector.Rotation());
+		float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(MissileMeshComponent->GetForwardVector(), targetVector)));
+		if (Angle > 1.0f) {
+			bHasTarget = false;
+		}
+
+		if (bHasTarget) {
+			FVector NewVector = FMath::VInterpNormalRotationTo(GetActorForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
+			SetActorRotation(NewVector.Rotation());
+		}
 	}
+	
 }
 
 void AMissileCustom::Fire()
@@ -205,16 +214,16 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 	else {
 		// handling error: hit other missile or yourself
 
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Missile is not working correctly");
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, "Missile is not working correctly");
 		FString messageOwner = "Missile owner: " + MissileOwner->GetName();
 		FString messagehit = " Hit: " + Other->GetName();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 		//SpawnExplosion();
 		//SelfDestruction();
 		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
 
 		//bHasHitTarget = true;
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Something went wrong on AMissileCustom::NotifyHit"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Something went wrong on AMissileCustom::NotifyHit"));
 	}
 }

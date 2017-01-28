@@ -53,6 +53,8 @@ private:
 
 	void FlyInCircle();
 
+	void FlyStraight();
+
 	void FireControl();
 
 	void AttackTarget(AActor* Target);
@@ -66,5 +68,7 @@ private:
 	float AttackInterval;
 
 	float Health;
+
+	float point;
 	
 };

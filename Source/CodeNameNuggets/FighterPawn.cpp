@@ -140,6 +140,9 @@ AFighterPawn::AFighterPawn()
 	aircraftHP = 100.f;
 	MissileRemain = 152;
 
+	// set up score
+	Score = 0.0f;
+
 	SpeedDelta = MaxSpeed - MinSpeed;
 	NormalAirSpeed = (MinSpeed + MaxSpeed) / 2;
 	bMissileOnLeftPylon = true;
@@ -213,11 +216,6 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 		//EngineSoundComponent->DestroyComponent();
 		//PlaneMesh->DestroyComponent();
 		Destroy();
-	}
-
-	if (Other->ActorHasTag("Aircraft")) {
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You hit an C-5!"));
-		ReceiveDamage(10.0f);
 	}
 	
 	FRotator CurrentRotation = GetActorRotation(RootComponent);
@@ -490,7 +488,6 @@ void AFighterPawn::LockOnTarget()
 	if (targetSelected) {
 		FVector targetLocation = targetSelected->GetActorLocation();
 		FVector targetVector = targetLocation - GetActorLocation();
-		//FVector::DotProduct(GetActorForwardVector(), targetVector);
 		Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(PlaneMesh->GetForwardVector(), targetVector)));
 		if (Angle <= 70) {
 			LockOnGauge += (45.f*GetWorld()->GetDeltaSeconds());
@@ -510,13 +507,15 @@ void AFighterPawn::LockOnTarget()
 		}
 		else if (Angle <= 70) {
 			// play locking sound
+			CurrentTarget = nullptr;
 			LockedSoundComponent->Stop();
 			LockingSoundComponent->Play();
-			CurrentTarget = nullptr;
 			targetSelected->SetLockOnStatus(1);
 		}
 		else {
 			CurrentTarget = nullptr;
+			LockedSoundComponent->Stop();
+			LockingSoundComponent->Stop();
 			targetSelected->SetLockOnStatus(1);
 		}
 	}
@@ -569,6 +568,16 @@ int AFighterPawn::GetHealth() const
 int AFighterPawn::GetMissile() const
 {
 	return FMath::FloorToInt(MissileRemain);
+}
+
+int AFighterPawn::GetScore() const
+{
+	return FMath::FloorToInt(Score);
+}
+
+void AFighterPawn::SetScore(float val)
+{
+	Score += val;
 }
 
 void AFighterPawn::SetSoundVolume(float volume)

@@ -165,6 +165,9 @@ private:
 	UPROPERTY(Category = Plane, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float aircraftHP;
 
+	UPROPERTY(Category = Plane, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float Score;
+
 	/** Set Aircraft ALT and vector */
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float CurrentHeading;
@@ -235,6 +238,12 @@ public:
 
 	UFUNCTION(Category = UI, BlueprintPure)
 	int GetMissile() const;
+
+	UFUNCTION(Category = UI, BlueprintPure)
+	int GetScore() const;
+
+	UFUNCTION(Category = UI, BlueprintCallable)
+	void SetScore(float val);
 
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundVolume(float volume);

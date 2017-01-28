@@ -4,6 +4,7 @@
 #include "EnemyPawn.h"
 #include "MissileCustom.h"
 #include "CustomExplosion_Aircraft.h"
+#include "FighterPawn.h"
 
 // Sets default values
 AEnemyPawn::AEnemyPawn()
@@ -36,6 +37,7 @@ AEnemyPawn::AEnemyPawn()
 
 	currentAttackTimer = 0.f;
 	Health = 100.f;
+	point = 1000000.f;
 	AttackInterval = 15.f;
 }
 
@@ -64,7 +66,7 @@ void AEnemyPawn::Tick( float DeltaTime )
 		// pawn is alive , continue the attack
 		// manage attack timer;
 		currentAttackTimer += GetWorld()->GetDeltaSeconds();
-		FlyInCircle();
+		FlyStraight();
 		//FireControl();
 	}
 	else {
@@ -107,6 +109,10 @@ bool AEnemyPawn::IsAlive()
 	bool result = true;
 	if (Health <= 0) {
 		result = false;
+		if (currentTarget->GetClass()->IsChildOf(AFighterPawn::StaticClass())) {
+			AFighterPawn* player = Cast<AFighterPawn>(currentTarget);
+			player->SetScore(point);
+		}
 	}
 	return result;
 }
@@ -128,6 +134,12 @@ void AEnemyPawn::FlyInCircle()
 
 	enemyAttitude = FRotator(20.f, 0.f, 0.f);
 	AddActorLocalRotation(enemyAttitude*GetWorld()->GetDeltaSeconds());
+}
+
+void AEnemyPawn::FlyStraight()
+{
+	FVector movingOffset = FVector(CurrentAirSpeed, 0.f, 0.f);
+	AddActorLocalOffset(movingOffset*GetWorld()->GetDeltaSeconds());
 }
 
 void AEnemyPawn::FireControl()
