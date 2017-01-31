@@ -171,6 +171,7 @@ void AEnemyPawn::SpreadHate()
 void AEnemyPawn::SetAlertStatus(int val)
 {
 	alertStatus = val;
+	currentTarget = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 void AEnemyPawn::FlyInCircle()
@@ -201,10 +202,12 @@ void AEnemyPawn::TrackingPlayer()
 	// keep the player in sight;
 	FVector currentLocation = GetActorLocation();
 	FVector targetLocation = currentTarget->GetActorLocation();
+
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, targetLocation.ToString());
 	FVector targetVector = targetLocation - currentLocation;
 	float distance = targetVector.Size();
 
-	if (distance> 8000.f) {
+	if (distance>= 8000.f) {
 		FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
 		SetActorRotation(NewVector.Rotation());
 	}
