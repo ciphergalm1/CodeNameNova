@@ -466,11 +466,11 @@ void AFighterPawn::StopFireGuns()
 void AFighterPawn::ToggleCannonSound()
 {
 	if (isFiringCannon) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Start gun firing sound"));
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Start gun firing sound"));
 		CannonSoundComponent->Play();
 	}
 	else {
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Stop gun firing sound"));
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("Stop gun firing sound"));
 		CannonSoundComponent->Stop();
 	}
 }

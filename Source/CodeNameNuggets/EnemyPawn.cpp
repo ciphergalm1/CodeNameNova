@@ -40,7 +40,7 @@ AEnemyPawn::AEnemyPawn()
 	point = 1000000.f;
 	AttackInterval = 15.f;
 	alertStatus = 0;
-	turnRate = 90.0f;
+	turnRate = 50.0f;
 
 	HateShape = FCollisionShape();
 	HateShape = FCollisionShape::MakeSphere(20000.f);
@@ -203,7 +203,6 @@ void AEnemyPawn::TrackingPlayer()
 	FVector currentLocation = GetActorLocation();
 	FVector targetLocation = currentTarget->GetActorLocation();
 
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, targetLocation.ToString());
 	FVector targetVector = targetLocation - currentLocation;
 	float distance = targetVector.Size();
 
@@ -234,8 +233,9 @@ bool AEnemyPawn::CanAttack()
 	FVector currentLocation = GetActorLocation();
 	FVector targetLocation = currentTarget->GetActorLocation();
 	FVector targetVector = targetLocation - currentLocation;
+	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(EnemyMesh->GetForwardVector(), targetVector)));
 	float distance = targetVector.Size();
-	if (distance<=10000.f) {
+	if (Angle<=45.f && distance<=10000.f) {
 		result = (currentAttackTimer > AttackInterval) ? true : false;
 	}
 	return result;
