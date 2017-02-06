@@ -577,6 +577,22 @@ int AFighterPawn::GetScore() const
 	return FMath::FloorToInt(Score);
 }
 
+float AFighterPawn::GetPitch() const
+{
+	FRotator currentRotation = GetActorRotation();
+	// get the Pitch
+	float result = currentRotation.Pitch;
+	return result;
+}
+
+float AFighterPawn::GetRoll() const
+{
+	FRotator currentRotation = GetActorRotation();
+	// get the Roll
+	float result = currentRotation.Roll;
+	return result;
+}
+
 void AFighterPawn::SetScore(float val)
 {
 	Score += val;

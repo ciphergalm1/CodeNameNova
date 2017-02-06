@@ -242,6 +242,12 @@ public:
 	UFUNCTION(Category = UI, BlueprintPure)
 	int GetScore() const;
 
+	UFUNCTION(Category = UI, BlueprintPure)
+	float GetPitch() const;
+
+	UFUNCTION(Category = UI, BlueprintPure)
+	float GetRoll() const;
+
 	UFUNCTION(Category = UI, BlueprintCallable)
 	void SetScore(float val);
 
