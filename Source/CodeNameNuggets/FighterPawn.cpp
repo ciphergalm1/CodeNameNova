@@ -70,7 +70,7 @@ AFighterPawn::AFighterPawn()
 
 	EngineSoundComponent->SetupAttachment(RootComponent);
 	
-
+	// set up the Gun Sound
 	ConstructorHelpers::FObjectFinder<USoundCue> CannonSoundRef(TEXT("SoundCue'/Game/SFX/Cannon/GSh301_Cue.GSh301_Cue'"));
 	CannonSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("GunSoundObj"));
 	if (CannonSoundRef.Succeeded()) {
@@ -80,7 +80,7 @@ AFighterPawn::AFighterPawn()
 	}
 
 	// set up the locking sound
-	ConstructorHelpers::FObjectFinder<USoundCue> LockingSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/BeaconFar_Cue.BeaconFar_Cue'"));
+	ConstructorHelpers::FObjectFinder<USoundCue> LockingSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/AIM9_Cue.AIM9_Cue'"));
 	LockingSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LockingSoundObject"));
 	if (LockingSoundRef.Succeeded()) {
 		LockingSoundComponent->SetSound(LockingSoundRef.Object);
@@ -515,6 +515,7 @@ void AFighterPawn::LockOnTarget()
 			targetSelected->SetLockOnStatus(1);
 		}
 		else {
+			// target selected and chasing
 			CurrentTarget = nullptr;
 			LockedSoundComponent->Stop();
 			LockingSoundComponent->Stop();
