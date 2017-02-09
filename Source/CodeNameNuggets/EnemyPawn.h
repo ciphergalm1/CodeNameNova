@@ -71,6 +71,8 @@ private:
 
 	void TrackingPlayer();
 
+	void FleeFromTarget();
+
 	void AttackTarget(AActor* Target);
 
 	bool CanAttack();

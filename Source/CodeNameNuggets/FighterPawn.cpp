@@ -80,7 +80,8 @@ AFighterPawn::AFighterPawn()
 	}
 
 	// set up the locking sound
-	ConstructorHelpers::FObjectFinder<USoundCue> LockingSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/AIM9_Cue.AIM9_Cue'"));
+	//  SoundCue'/Game/SFX/FireControll/AIM9_Cue.AIM9_Cue'
+	ConstructorHelpers::FObjectFinder<USoundCue> LockingSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/LockWarning_Cue.LockWarning_Cue'"));
 	LockingSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LockingSoundObject"));
 	if (LockingSoundRef.Succeeded()) {
 		LockingSoundComponent->SetSound(LockingSoundRef.Object);
@@ -89,7 +90,8 @@ AFighterPawn::AFighterPawn()
 	}
 
 	// set up the locked sound 
-	ConstructorHelpers::FObjectFinder<USoundCue> LockedSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/LockWarning_Cue.LockWarning_Cue'"));
+	// SoundCue'/Game/SFX/FireControll/LockWarning_Cue.LockWarning_Cue'
+	ConstructorHelpers::FObjectFinder<USoundCue> LockedSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/AIM9_Cue.AIM9_Cue'"));
 	LockedSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LockedSoundObject"));
 	if (LockedSoundRef.Succeeded()) {
 		LockedSoundComponent->SetSound(LockedSoundRef.Object);

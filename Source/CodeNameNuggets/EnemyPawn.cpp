@@ -70,17 +70,24 @@ void AEnemyPawn::Tick( float DeltaTime )
 	if (IsAlive()) {
 		// pawn is alive , continue the attack
 		// manage attack timer;
+		FlyStraight();
 		currentAttackTimer += GetWorld()->GetDeltaSeconds();
 		if (alertStatus == 0) {
 			// Normal Patrol
-			FlyStraight();
+			
 		}
-		else if( alertStatus == 1) 
+		else if( alertStatus == 1)  // enemy has been alerted!
 		{
 			// Engage Player code here
-			FlyStraight();
-			TrackingPlayer();
-			FireControl();
+			if (LockOnStatus <= 1) {
+				TrackingPlayer();
+				FireControl();
+			}
+			// enemy has been locked on by player
+			if (LockOnStatus > 1) {
+				TrackingPlayer();
+				//FleeFromTarget();
+			}
 		}
 		//FireControl();
 	}
@@ -210,6 +217,20 @@ void AEnemyPawn::TrackingPlayer()
 		FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
 		SetActorRotation(NewVector.Rotation());
 	}
+	
+}
+
+void AEnemyPawn::FleeFromTarget()
+{
+	// Flee from the target
+	FVector currentLocation = GetActorLocation();
+	FVector targetLocation = currentTarget->GetActorLocation();
+
+	FVector targetVector = targetLocation - currentLocation;
+	targetVector = -targetVector;
+
+	FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
+	SetActorRotation(NewVector.Rotation());
 	
 }
 
