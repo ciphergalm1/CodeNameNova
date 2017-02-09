@@ -81,7 +81,7 @@ AFighterPawn::AFighterPawn()
 
 	// set up the locking sound
 	//  SoundCue'/Game/SFX/FireControll/AIM9_Cue.AIM9_Cue'
-	ConstructorHelpers::FObjectFinder<USoundCue> LockingSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/LockWarning_Cue.LockWarning_Cue'"));
+	ConstructorHelpers::FObjectFinder<USoundCue> LockingSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/BeatTone_Cue.BeatTone_Cue'"));
 	LockingSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LockingSoundObject"));
 	if (LockingSoundRef.Succeeded()) {
 		LockingSoundComponent->SetSound(LockingSoundRef.Object);
@@ -91,7 +91,7 @@ AFighterPawn::AFighterPawn()
 
 	// set up the locked sound 
 	// SoundCue'/Game/SFX/FireControll/LockWarning_Cue.LockWarning_Cue'
-	ConstructorHelpers::FObjectFinder<USoundCue> LockedSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/AIM9_Cue.AIM9_Cue'"));
+	ConstructorHelpers::FObjectFinder<USoundCue> LockedSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/LockWarning_Cue.LockWarning_Cue'"));
 	LockedSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LockedSoundObject"));
 	if (LockedSoundRef.Succeeded()) {
 		LockedSoundComponent->SetSound(LockedSoundRef.Object);
@@ -122,9 +122,10 @@ AFighterPawn::AFighterPawn()
 	CurrentYawSpeed = 0.0f;
 
 	/* set the weapon lock capability */
-	DetectDistance = 40000.f;
+	DetectionDistance = 60000.f;
+	DetectionRadius = 20000.f;
 	DetectionShape = FCollisionShape();
-	DetectionShape = FCollisionShape::MakeCapsule(5000.f, 30000.f);
+	DetectionShape = FCollisionShape::MakeCapsule(DetectionRadius, DetectionDistance);
 	//DetectionShape.SetCapsule(3000.f,30000.f);
 
 	/** set up target selection  */
@@ -342,7 +343,7 @@ void AFighterPawn::SearchTarget()
 {
 	TArray<FHitResult> HitResults;
 	FVector StartPos = PlaneMesh->GetSocketLocation(FName("Nose"));
-	FVector EndPos = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectDistance;
+	FVector EndPos = PlaneMesh->GetSocketLocation(FName("Nose")) + GetActorForwardVector()*DetectionDistance;
 	FCollisionQueryParams CollisionParams;
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("----------------------------------------------------"));
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Start target searching!"));

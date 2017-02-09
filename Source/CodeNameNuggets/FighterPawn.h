@@ -182,7 +182,10 @@ private:
 	float NormalAirSpeed;
 
 	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float DetectDistance;
+	float DetectionDistance;
+
+	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float DetectionRadius;
 
 	UPROPERTY(Category = Weapon, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float MissileRemain;
