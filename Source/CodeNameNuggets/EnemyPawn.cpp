@@ -256,7 +256,8 @@ bool AEnemyPawn::CanAttack()
 	FVector targetVector = targetLocation - currentLocation;
 	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(EnemyMesh->GetForwardVector(), targetVector)));
 	float distance = targetVector.Size();
-	if (Angle<=20.f && distance<=10000.f) {
+	// determine if the player is in front of the enemy
+	if (Angle<=15.f && distance<=10000.f) {
 		result = (currentAttackTimer > AttackInterval) ? true : false;
 	}
 	return result;
