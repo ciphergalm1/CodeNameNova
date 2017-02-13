@@ -4,6 +4,7 @@
 #include "MissileCustom.h"
 #include "CustomExplosion_Aircraft.h"
 #include "EnemyPawn.h"
+#include "FighterPawn.h"
 
 
 // Sets default values
@@ -196,6 +197,14 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 			AEnemyPawn* tempTarget = Cast<AEnemyPawn>(Other);
 			tempTarget->ReceiveDamage(damage);
 		}
+
+		if (Other->GetClass()->IsChildOf(AFighterPawn::StaticClass())) {
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Other actor is EnemyPawn type"));
+			AFighterPawn* tempTarget = Cast<AFighterPawn>(Other);
+			tempTarget->ReceiveDamage(damage);
+		}
+
+
 
 		SpawnExplosion();
 		SelfDestruction();
