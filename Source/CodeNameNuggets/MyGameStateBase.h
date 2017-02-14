@@ -22,6 +22,22 @@ public:
 
 	UFUNCTION(Category = PlayerState, BlueprintPure)
 	int GetEnemyInLevel();
+
+	int PlayerKills =0;
+
+	UFUNCTION(Category = PlayerState, BlueprintCallable)
+	void AddPlayerKills();
+
+	UFUNCTION(Category = PlayerState, BlueprintPure)
+	int GetPlayerKills();
+
+	int PlayerScore = 0;
+
+	UFUNCTION(Category = PlayerState, BlueprintCallable)
+	void AddPlayerScore(int ScoreDelta);
+
+	UFUNCTION(Category = PlayerState, BlueprintPure)
+	int GetPlayerScore();
 	
 	
 	

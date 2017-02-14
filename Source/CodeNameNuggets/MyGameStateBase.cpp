@@ -12,3 +12,23 @@ int AMyGameStateBase::GetEnemyInLevel()
 {
 	return EnemyInLevel;
 }
+
+void AMyGameStateBase::AddPlayerKills()
+{
+	PlayerKills++;
+}
+
+int AMyGameStateBase::GetPlayerKills()
+{
+	return PlayerKills;
+}
+
+void AMyGameStateBase::AddPlayerScore(int ScoreDelta)
+{
+	PlayerScore += ScoreDelta;
+}
+
+int AMyGameStateBase::GetPlayerScore()
+{
+	return PlayerScore;
+}

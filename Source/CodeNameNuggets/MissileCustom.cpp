@@ -52,7 +52,7 @@ AMissileCustom::AMissileCustom()
 	bHasTarget = false;
 
 	// set up homing ability
-	homingAngle = 5.f;
+	homingAngle = 3.f;
 
 	// set up missile damage
 	damage = 35.f;
@@ -188,10 +188,10 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 	if (currentTarget == Other) {
 		// The missile hit its target
 
-		FString messageOwner = "Missile Owner: " + MissileOwner->GetName();
-		FString messagehit = " Hit Target: " + Other->GetName();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
+		//FString messageOwner = "Missile Owner: " + MissileOwner->GetName();
+		//FString messagehit = " Hit Target: " + Other->GetName();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messageOwner);
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, messagehit);
 
 		if (Other->GetClass()->IsChildOf(AEnemyPawn::StaticClass())) {
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Other actor is EnemyPawn type"));
@@ -209,7 +209,7 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 
 		SpawnExplosion();
 		SelfDestruction();
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Target hit!"));
 
 		bHasHitTarget = true;
 	}

@@ -7,6 +7,7 @@
 #include "GunShell.h"
 #include "EnemyPawn.h"
 #include "MyPlayerState.h"
+#include "MyGameStateBase.h"
 
 AFighterPawn::AFighterPawn()
 {
@@ -608,10 +609,24 @@ float AFighterPawn::GetRoll() const
 void AFighterPawn::SetScore(float val)
 {
 	Score += val;
+	//
+	AGameStateBase* CurrentGameState = GetWorld()->GetGameState();
+	if (CurrentGameState) {
+		AMyGameStateBase* myGameState = Cast<AMyGameStateBase>(CurrentGameState);
+		myGameState->AddPlayerKills();
+		myGameState->AddPlayerScore(FMath::FloorToInt(val));
+	}
+
 }
 
-void AFighterPawn::SetKills(float EnemyKills)
+void AFighterPawn::AddKill()
 {
+	PlayerKills++;
+}
+
+int AFighterPawn::GetKill()
+{
+	return PlayerKills;
 }
 
 void AFighterPawn::SetSoundVolume(float volume)

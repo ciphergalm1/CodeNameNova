@@ -40,7 +40,7 @@ AEnemyPawn::AEnemyPawn()
 	point = 1000000.f;
 	AttackInterval = 15.f;
 	alertStatus = 0;
-	turnRate = 50.0f;
+	turnRate = 30.0f;
 
 	HateShape = FCollisionShape();
 	HateShape = FCollisionShape::MakeSphere(20000.f);
@@ -135,6 +135,7 @@ bool AEnemyPawn::IsAlive()
 			if (currentTarget->GetClass()->IsChildOf(AFighterPawn::StaticClass())) {
 				AFighterPawn* player = Cast<AFighterPawn>(currentTarget);
 				player->SetScore(point);
+
 			}
 		}
 	}
@@ -242,8 +243,9 @@ void AEnemyPawn::FleeFromTarget()
 
 void AEnemyPawn::AttackTarget(AActor * Target)
 {
+	// check for null pointer
 	if (Target) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have fire at you!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have fire at you!"));
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = this;
 		SpawnParams.Instigator = Instigator;

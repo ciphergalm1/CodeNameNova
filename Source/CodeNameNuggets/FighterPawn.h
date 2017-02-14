@@ -261,7 +261,10 @@ public:
 	void SetScore(float val);
 
 	UFUNCTION(Category = UI, BlueprintCallable)
-	void SetKills(float EnemyKills);
+	void AddKill();
+
+	UFUNCTION(Category = UI, BlueprintCallable)
+	int GetKill();
 
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundVolume(float volume);
