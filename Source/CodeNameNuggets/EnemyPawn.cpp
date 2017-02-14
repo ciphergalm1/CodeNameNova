@@ -131,9 +131,11 @@ bool AEnemyPawn::IsAlive()
 	bool result = true;
 	if (Health <= 0) {
 		result = false;
-		if (currentTarget->GetClass()->IsChildOf(AFighterPawn::StaticClass())) {
-			AFighterPawn* player = Cast<AFighterPawn>(currentTarget);
-			player->SetScore(point);
+		if (currentTarget) {
+			if (currentTarget->GetClass()->IsChildOf(AFighterPawn::StaticClass())) {
+				AFighterPawn* player = Cast<AFighterPawn>(currentTarget);
+				player->SetScore(point);
+			}
 		}
 	}
 	return result;
@@ -205,58 +207,69 @@ void AEnemyPawn::FireControl()
 void AEnemyPawn::TrackingPlayer()
 {
 	// keep the player in sight;
-	FVector currentLocation = GetActorLocation();
-	FVector targetLocation = currentTarget->GetActorLocation();
+	if (currentTarget) {
+		FVector currentLocation = GetActorLocation();
+		FVector targetLocation = currentTarget->GetActorLocation();
 
-	FVector targetVector = targetLocation - currentLocation;
-	float distance = targetVector.Size();
+		FVector targetVector = targetLocation - currentLocation;
+		float distance = targetVector.Size();
 
-	if (distance>= 8000.f) {
-		FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
-		SetActorRotation(NewVector.Rotation());
+		if (distance >= 8000.f) {
+			FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
+			SetActorRotation(NewVector.Rotation());
+		}
 	}
+	
 	
 }
 
 void AEnemyPawn::FleeFromTarget()
 {
 	// Flee from the target
-	FVector currentLocation = GetActorLocation();
-	FVector targetLocation = currentTarget->GetActorLocation();
+	if (currentTarget) {
+		FVector currentLocation = GetActorLocation();
+		FVector targetLocation = currentTarget->GetActorLocation();
 
-	FVector targetVector = targetLocation - currentLocation;
-	targetVector = -targetVector;
+		FVector targetVector = targetLocation - currentLocation;
+		targetVector = -targetVector;
 
-	FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
-	SetActorRotation(NewVector.Rotation());
+		FVector NewVector = FMath::VInterpNormalRotationTo(EnemyMesh->GetForwardVector(), targetVector, GetWorld()->GetDeltaSeconds(), turnRate);
+		SetActorRotation(NewVector.Rotation());
+	}
+	
 	
 }
 
 void AEnemyPawn::AttackTarget(AActor * Target)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have fire at you!"));
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = Instigator;
-	FVector SpawnLocation = EnemyMesh->GetSocketLocation(FName("Pylon_Main"));
-	FRotator SpawnRotation = GetActorRotation();
-	AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
-	missile->EngageTarget(Target, this);
+	if (Target) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("I have fire at you!"));
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = Instigator;
+		FVector SpawnLocation = EnemyMesh->GetSocketLocation(FName("Pylon_Main"));
+		FRotator SpawnRotation = GetActorRotation();
+		AMissileCustom* missile = GetWorld()->SpawnActor<AMissileCustom>(SpawnLocation, SpawnRotation, SpawnParams);
+		missile->EngageTarget(Target, this);
+	}
+	
 }
 
 bool AEnemyPawn::CanAttack()
 {
 	// the condition to attack is here
 	bool result = false;
-	// target within angle
-	FVector currentLocation = GetActorLocation();
-	FVector targetLocation = currentTarget->GetActorLocation();
-	FVector targetVector = targetLocation - currentLocation;
-	float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(EnemyMesh->GetForwardVector(), targetVector)));
-	float distance = targetVector.Size();
-	// determine if the player is in front of the enemy
-	if (Angle<=15.f && distance<=10000.f) {
-		result = (currentAttackTimer > AttackInterval) ? true : false;
+	if (currentTarget) {
+		// target within angle
+		FVector currentLocation = GetActorLocation();
+		FVector targetLocation = currentTarget->GetActorLocation();
+		FVector targetVector = targetLocation - currentLocation;
+		float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(EnemyMesh->GetForwardVector(), targetVector)));
+		float distance = targetVector.Size();
+		// determine if the player is in front of the enemy
+		if (Angle <= 15.f && distance <= 10000.f) {
+			result = (currentAttackTimer > AttackInterval) ? true : false;
+		}
 	}
 	return result;
 }
