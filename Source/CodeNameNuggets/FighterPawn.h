@@ -280,6 +280,10 @@ private:
 	// Handling AfterBurner Effect
 	void ConfigAfterBurner();
 
+	void SelfDestruction();
+
+	bool IsAlive();
+
 	
 
 	

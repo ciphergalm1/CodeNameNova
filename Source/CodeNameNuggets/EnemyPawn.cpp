@@ -22,7 +22,7 @@ AEnemyPawn::AEnemyPawn()
 	Tags.Insert(FName("EnemyAircraft"), 0);
 	
 	RootComponent = EnemyMesh;
-	EnemyMesh->SetSimulatePhysics(true);
+	EnemyMesh->SetSimulatePhysics(false);
 	EnemyMesh->bAutoActivate = true;
 	EnemyMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	EnemyMesh->SetComponentTickEnabled(true);
@@ -57,10 +57,8 @@ void AEnemyPawn::NotifyHit(UPrimitiveComponent * MyComp, AActor * Other, UPrimit
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
-	//FString message = "This is your enemy fighter pawn: " + GetName();
-	//message += ". I have been hit by";
-	//message += Other->GetName();
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, message);
+	FRotator CurrentRotation = GetActorRotation(RootComponent);
+	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
 }
 
 // Called every frame

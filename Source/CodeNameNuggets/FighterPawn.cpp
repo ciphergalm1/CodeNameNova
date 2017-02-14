@@ -157,47 +157,52 @@ void AFighterPawn::Tick(float DeltaSeconds)
 
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
 
-	// check component tag
-	/*
-	if (PlaneMesh->ComponentHasTag("PlayerAircraft")&&this->ActorHasTag("PlayerAircraft")) {
+	if (IsAlive()) {
+		// check component tag
+		/*
+		if (PlaneMesh->ComponentHasTag("PlayerAircraft")&&this->ActorHasTag("PlayerAircraft")) {
 		FString tagMessage = this->Tags.Top().ToString();
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, tagMessage);
+		}
+		*/
+
+		// Move plane forwards (with sweep so we stop when we collide with things)
+		AddActorLocalOffset(LocalMove, true);
+
+		// Calculate change in rotation this frame
+		FRotator DeltaRotation(0, 0, 0);
+		DeltaRotation.Pitch = CurrentPitchSpeed * DeltaSeconds;
+		DeltaRotation.Yaw = CurrentYawSpeed * DeltaSeconds;
+		DeltaRotation.Roll = CurrentRollSpeed * DeltaSeconds;
+
+		// Rotate plane
+		AddActorLocalRotation(DeltaRotation);
+
+		// Rotate Camera
+		FRotator newCameraRotator(0, 0, 0);
+		newCameraRotator.Yaw = CurrentCameraYaw;
+		newCameraRotator.Pitch = CurrentCameraPitch;
+
+		SpringArm->RelativeRotation = newCameraRotator;
+		/*
+		FHitResult hit;
+		SpringArm->K2_SetRelativeRotation(newCameraRotator, false, hit, false);
+		*/
+
+		// config guns 
+		ShootGuns();
+
+		// config target lock on
+		LockOnTarget();
+
+		// config afterburnerEffect
+		ConfigAfterBurner();
+
+		// Call any parent class Tick implementation
 	}
-	*/
-
-	// Move plane forwards (with sweep so we stop when we collide with things)
-	AddActorLocalOffset(LocalMove, true);
-
-	// Calculate change in rotation this frame
-	FRotator DeltaRotation(0, 0, 0);
-	DeltaRotation.Pitch = CurrentPitchSpeed * DeltaSeconds;
-	DeltaRotation.Yaw = CurrentYawSpeed * DeltaSeconds;
-	DeltaRotation.Roll = CurrentRollSpeed * DeltaSeconds;
-
-	// Rotate plane
-	AddActorLocalRotation(DeltaRotation);
-
-	// Rotate Camera
-	FRotator newCameraRotator(0, 0, 0);
-	newCameraRotator.Yaw = CurrentCameraYaw;
-	newCameraRotator.Pitch = CurrentCameraPitch;
-	
-	SpringArm->RelativeRotation = newCameraRotator;
-	/*
-	FHitResult hit;
-	SpringArm->K2_SetRelativeRotation(newCameraRotator, false, hit, false);
-	*/
-
-	// config guns 
-	ShootGuns();
-
-	// config target lock on
-	LockOnTarget();
-
-	// config afterburnerEffect
-	ConfigAfterBurner();
-
-	// Call any parent class Tick implementation
+	else {
+		SelfDestruction();
+	}
 	Super::Tick(DeltaSeconds);
 }
 
@@ -225,8 +230,6 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 	
 	FRotator CurrentRotation = GetActorRotation(RootComponent);
 	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
-	
-	
 }
 
 
@@ -669,4 +672,26 @@ void AFighterPawn::ConfigAfterBurner()
 		AfterBurnerComponent->SetFloatParameter(FName("AfterBurnerRatio"), outputRatio);
 		AfterBurnerComponent->SetFloatParameter(FName("DistortionLifeTime"), distortionRatio);
 	}
+}
+
+void AFighterPawn::SelfDestruction()
+{
+	SpawnExplosion();
+	EngineSoundComponent->SetVolumeMultiplier(0.0f);
+	//EngineSoundComponent->SetPaused(true);
+	//EngineSoundComponent->PlaybackCompleted(EngineSoundComponent->GetAudioComponentID(),false);
+	EngineSoundComponent->FadeOut(.5f, .0f);
+	LockedSoundComponent->Stop();
+	LockingSoundComponent->Stop();
+	EngineSoundComponent->Stop();
+	EngineSoundComponent->Deactivate();
+	//EngineSoundComponent->DestroyComponent();
+	//PlaneMesh->DestroyComponent();
+	Destroy();
+}
+
+bool AFighterPawn::IsAlive()
+{
+	bool result = aircraftHP>0 ? true : false;
+	return result;
 }

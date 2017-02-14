@@ -20,7 +20,7 @@ public:
 	UFUNCTION(Category = PlayerState, BlueprintCallable)
 	void SetScore(int val);
 
-	UFUNCTION(Category = PlayerState, BlueprintCallable)
+	UFUNCTION(Category = PlayerState, BlueprintPure)
 	int GetScore();
 
 	int PlayerKills = 0;
@@ -28,7 +28,7 @@ public:
 	UFUNCTION(Category = PlayerState, BlueprintCallable)
 	void SetPlayerKills(int val);
 
-	UFUNCTION(Category = PlayerState, BlueprintCallable)
+	UFUNCTION(Category = PlayerState, BlueprintPure)
 	int GetPlayerKills();
 	
 };
