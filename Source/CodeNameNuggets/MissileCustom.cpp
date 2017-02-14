@@ -121,6 +121,11 @@ void AMissileCustom::SetDamage(float val)
 	damage = val;
 }
 
+bool AMissileCustom::hasTarget()
+{
+	return bHasTarget;
+}
+
 void AMissileCustom::Boosting()
 {
 	FVector movment = FVector(currentAirSpeed, 0.f, 0.f);

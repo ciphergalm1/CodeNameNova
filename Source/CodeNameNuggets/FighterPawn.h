@@ -34,6 +34,9 @@ class CODENAMENUGGETS_API AFighterPawn : public APawn
 	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UAudioComponent* LockedSoundComponent;
 
+	UPROPERTY(Category = Audio, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UAudioComponent* MissileWarningSoundComponent;
+
 	UPROPERTY(Category = VFX, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* AfterBurnerComponent;
 
@@ -198,6 +201,10 @@ private:
 
 	struct FCollisionShape DetectionShape;
 
+	struct FCollisionShape MissileDetectionShape;
+
+	float MissileDetectionRadius;
+
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class APawn* CurrentTarget;
 
@@ -216,6 +223,8 @@ private:
 	void LockOnTarget();
 
 	void ResetGunCool();
+
+	void ToggleMissileWarning();
 
 public:
 
@@ -263,8 +272,11 @@ public:
 	UFUNCTION(Category = UI, BlueprintCallable)
 	void AddKill();
 
-	UFUNCTION(Category = UI, BlueprintCallable)
+	UFUNCTION(Category = UI, BlueprintPure)
 	int GetKill();
+
+	UFUNCTION(Category = UI, BlueprintPure)
+	bool DetectMissile();
 
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundVolume(float volume);

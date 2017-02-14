@@ -42,6 +42,8 @@ public:
 
 	void SetDamage(float val);
 
+	bool hasTarget();
+
 private:
 
 	// Manage target hit flag

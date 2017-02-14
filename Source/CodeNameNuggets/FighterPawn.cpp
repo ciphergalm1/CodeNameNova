@@ -101,6 +101,15 @@ AFighterPawn::AFighterPawn()
 		LockedSoundComponent->SetupAttachment(RootComponent);
 	}
 
+	// set up the missile warning sound
+	ConstructorHelpers::FObjectFinder<USoundCue> MissileWarningSoundRef(TEXT("SoundCue'/Game/SFX/FireControll/MissileWarning_Cue.MissileWarning_Cue'"));
+	MissileWarningSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MissileWarningSoundObject"));
+	if (MissileWarningSoundRef.Succeeded()) {
+		MissileWarningSoundComponent->SetSound(MissileWarningSoundRef.Object);
+		MissileWarningSoundComponent->bAutoActivate = false;
+		MissileWarningSoundComponent->SetupAttachment(RootComponent);
+	}
+
 
 	// set up the afterburner component
 	ConstructorHelpers::FObjectFinder<UParticleSystem> afterBurnerRef(TEXT("ParticleSystem'/Game/Assets/ParticleSystem/P_AfterBurner.P_AfterBurner'"));
@@ -129,6 +138,12 @@ AFighterPawn::AFighterPawn()
 	DetectionShape = FCollisionShape();
 	DetectionShape = FCollisionShape::MakeCapsule(DetectionRadius, DetectionDistance);
 	//DetectionShape.SetCapsule(3000.f,30000.f);
+
+	// set missile detection shape
+	MissileDetectionRadius = 80000.f;
+	MissileDetectionShape = FCollisionShape();
+	MissileDetectionShape = FCollisionShape::MakeSphere(MissileDetectionRadius);
+
 
 	/** set up target selection  */
 	LockOnGauge = 0;
@@ -204,6 +219,8 @@ void AFighterPawn::Tick(float DeltaSeconds)
 		// config afterburnerEffect
 		ConfigAfterBurner();
 
+		ToggleMissileWarning();
+
 		// Call any parent class Tick implementation
 	}
 	else {
@@ -219,19 +236,7 @@ void AFighterPawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Ot
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("You plane hit something!"));
 	// Destroy the pawn if player hit the ground
 	if (Other->ActorHasTag("Terrain")) {
-		// emit the explosion
-		SpawnExplosion();
-		EngineSoundComponent->SetVolumeMultiplier(0.0f);
-		//EngineSoundComponent->SetPaused(true);
-		//EngineSoundComponent->PlaybackCompleted(EngineSoundComponent->GetAudioComponentID(),false);
-		EngineSoundComponent->FadeOut(.5f, .0f);
-		LockedSoundComponent->Stop();
-		LockingSoundComponent->Stop();
-		EngineSoundComponent->Stop();
-		EngineSoundComponent->Deactivate();
-		//EngineSoundComponent->DestroyComponent();
-		//PlaneMesh->DestroyComponent();
-		Destroy();
+		SelfDestruction();
 	}
 	
 	FRotator CurrentRotation = GetActorRotation(RootComponent);
@@ -547,6 +552,38 @@ void AFighterPawn::ResetGunCool()
 	canFireCannon = true;
 }
 
+bool AFighterPawn::DetectMissile()
+{
+	bool result = false;
+	// get all missile instance and decide if the missile is targeting the player
+	TArray<AActor*> FoundMissiles;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMissileCustom::StaticClass(), FoundMissiles);
+	for (auto it = FoundMissiles.CreateIterator(); it; it++) {
+		AActor* target = *it;
+		AMissileCustom* incomingMissile = Cast<AMissileCustom>(target);
+		if (incomingMissile->MissileOwner != this && incomingMissile->hasTarget()) {
+			result = true;
+			FString message = "missile incoming!";
+			return result;
+		}	
+	}
+	return result;
+}
+
+void AFighterPawn::ToggleMissileWarning()
+{
+	if (DetectMissile()) {
+		// Play alarm sound and message for the player
+		MissileWarningSoundComponent->Play();
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("start warning sound"));
+	}
+	else {
+		// stop playing sound and message for the player
+		MissileWarningSoundComponent->Stop();
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("stop warning sound"));
+	}
+}
+
 float AFighterPawn::GetAirSpeed() const
 {
 	return CurrentForwardSpeed/10;
@@ -707,6 +744,8 @@ void AFighterPawn::SelfDestruction()
 	EngineSoundComponent->FadeOut(.5f, .0f);
 	LockedSoundComponent->Stop();
 	LockingSoundComponent->Stop();
+	MissileWarningSoundComponent->Stop();
+	MissileWarningSoundComponent->Deactivate();
 	EngineSoundComponent->Stop();
 	EngineSoundComponent->Deactivate();
 	//EngineSoundComponent->DestroyComponent();
