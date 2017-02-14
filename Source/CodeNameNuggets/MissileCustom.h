@@ -63,6 +63,8 @@ private:
 
 	float turnRate;
 
+	float homingAngle;
+
 	void Boosting();
 
 	void SetTarget(AActor* target);

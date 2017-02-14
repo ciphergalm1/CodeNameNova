@@ -46,15 +46,18 @@ AMissileCustom::AMissileCustom()
 
 	// SetActorEnableCollision(true);
 	// set up the missile
-	currentAirSpeed = 8000.f;
+	currentAirSpeed = 10000.f;
 	bHasHitTarget = false;
 	bHasBeenFired = false;
 	bHasTarget = false;
 
+	// set up homing ability
+	homingAngle = 5.f;
+
 	// set up missile damage
 	damage = 35.f;
 
-	SelfDestructionTimer = 3.0f;
+	SelfDestructionTimer = 10.0f;
 	
 	fLifeTimeMax = 25.0f;
 
@@ -140,7 +143,7 @@ void AMissileCustom::Homing(AActor * target)
 		FVector targetLocation = target->GetActorLocation();
 		FVector targetVector = targetLocation - currentLocation;
 		float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(MissileMeshComponent->GetForwardVector(), targetVector)));
-		if (Angle > 1.0f) {
+		if (Angle > homingAngle) {
 			bHasTarget = false;
 		}
 
@@ -155,8 +158,6 @@ void AMissileCustom::Homing(AActor * target)
 void AMissileCustom::Fire()
 {
 	bHasBeenFired = true;
-	//FVector movment = FVector(currentAirSpeed, 0.f, 0.f);
-	//AddActorLocalOffset(movment);
 }
 
 void AMissileCustom::SelfDestruction()
@@ -216,7 +217,6 @@ void AMissileCustom::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* 
 		// the missile hit some thing which is not supposed to hit
 		SpawnExplosion();
 		SelfDestruction();
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString("Your missile hit something it is not supposed to hit!"));
 
 		bHasHitTarget = true;
 	}

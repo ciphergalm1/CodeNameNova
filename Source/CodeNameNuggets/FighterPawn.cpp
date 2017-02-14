@@ -6,6 +6,7 @@
 #include "MissileCustom.h"
 #include "GunShell.h"
 #include "EnemyPawn.h"
+#include "MyPlayerState.h"
 
 AFighterPawn::AFighterPawn()
 {
@@ -149,6 +150,10 @@ AFighterPawn::AFighterPawn()
 	SpeedDelta = MaxSpeed - MinSpeed;
 	NormalAirSpeed = (MinSpeed + MaxSpeed) / 2;
 	bMissileOnLeftPylon = true;
+
+	// set up player state
+	//PlayerState = 
+
 }
 
 void AFighterPawn::Tick(float DeltaSeconds)
@@ -603,6 +608,10 @@ float AFighterPawn::GetRoll() const
 void AFighterPawn::SetScore(float val)
 {
 	Score += val;
+}
+
+void AFighterPawn::SetKills(float EnemyKills)
+{
 }
 
 void AFighterPawn::SetSoundVolume(float volume)

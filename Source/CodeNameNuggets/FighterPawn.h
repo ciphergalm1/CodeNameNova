@@ -168,6 +168,9 @@ private:
 	UPROPERTY(Category = Plane, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float Score;
 
+	UPROPERTY(Category = Plane, EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	int PlayerKills;
+
 	/** Set Aircraft ALT and vector */
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float CurrentHeading;
@@ -200,6 +203,9 @@ private:
 
 	UPROPERTY(Category = Plane, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class AEnemyPawn* targetSelected;
+
+	//UPROPERTY(Category = PlayStatus, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//class AMyPlayerState* PlayerState;
 
 	void ClearSelectTarget();
 
@@ -253,6 +259,9 @@ public:
 
 	UFUNCTION(Category = UI, BlueprintCallable)
 	void SetScore(float val);
+
+	UFUNCTION(Category = UI, BlueprintCallable)
+	void SetKills(float EnemyKills);
 
 	UFUNCTION(Category = Sound, BlueprintCallable)
 	void SetSoundVolume(float volume);
