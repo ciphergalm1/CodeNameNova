@@ -108,6 +108,7 @@ AFighterPawn::AFighterPawn()
 		MissileWarningSoundComponent->SetSound(MissileWarningSoundRef.Object);
 		MissileWarningSoundComponent->bAutoActivate = false;
 		MissileWarningSoundComponent->SetupAttachment(RootComponent);
+		MissileWarningSoundComponent->Stop();
 	}
 
 
@@ -575,12 +576,12 @@ void AFighterPawn::ToggleMissileWarning()
 	if (DetectMissile()) {
 		// Play alarm sound and message for the player
 		MissileWarningSoundComponent->Play();
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("start warning sound"));
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("start warning sound"));
 	}
 	else {
 		// stop playing sound and message for the player
 		MissileWarningSoundComponent->Stop();
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("stop warning sound"));
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Yellow, TEXT("stop warning sound"));
 	}
 }
 
